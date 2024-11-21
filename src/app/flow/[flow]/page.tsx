@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import LeftNavBar from '../../../components/navbar';
-import NumericQuestion from '../../../components/NumericQuestion';
-import TextQuestion from '../../../components/TextQuestion';
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import LeftNavBar from "../../../components/navbar";
+import NumericQuestion from "../../../components/NumericQuestion";
+import TextQuestion from "../../../components/TextQuestion";
 
 type Question = {
   text: string;
-  inputType: 'number' | 'text';
+  inputType: "number" | "text";
   min?: number;
   max?: number;
   lowOutcome?: string;
@@ -16,38 +16,93 @@ type Question = {
   placeholder?: string;
 };
 
+type Page = {
+  id: string;
+  name: string;
+  questions: Question[];
+};
+
 type Flow = {
   id: string;
   name: string;
   description: string;
   questions: Question[];
+  pages: Page[];
 };
 
 export default function FlowEditor() {
   const params = useParams();
   const [flow, setFlow] = useState<Flow | null>(null);
-  const [questionType, setQuestionType] = useState<'number' | 'text'>('number');
+  const [questionType, setQuestionType] = useState<"number" | "text">("number");
   const [isPreview, setIsPreview] = useState<boolean>(false);
-  const [previewAnswers, setPreviewAnswers] = useState<Record<number, string | number>>({});
+  const [previewAnswers, setPreviewAnswers] = useState<
+    Record<number, string | number>
+  >({});
+  const [currentPageIndex, setCurrentPageIndex] = useState<number>(0);
 
   useEffect(() => {
     const flowId = params.flow as string;
-    const flows = JSON.parse(localStorage.getItem('flows') || '[]') as Flow[];
+    const flows = JSON.parse(localStorage.getItem("flows") || "[]") as Flow[];
     const currentFlow = flows.find((f) => f.id === flowId) || null;
+
+    if (currentFlow) {
+      if (!currentFlow.pages) {
+        currentFlow.pages = [];
+        const updatedFlows = flows.map((f) =>
+          f.id === currentFlow.id ? currentFlow : f
+        );
+        localStorage.setItem("flows", JSON.stringify(updatedFlows));
+      }
+    }
+
     setFlow(currentFlow);
   }, [params.flow]);
+
+  const handleAddPage = () => {
+    if (!flow) return;
+
+    const newPageId = `page${flow.pages.length + 1}`;
+    const newPage: Page = {
+      id: newPageId,
+      name: `Side ${flow.pages.length + 1}`,
+      questions: [],
+    };
+
+    const updatedFlow: Flow = {
+      ...flow,
+      pages: [...flow.pages, newPage],
+    };
+
+    // Update flows in local storage
+    const flows = JSON.parse(localStorage.getItem("flows") || "[]") as Flow[];
+    const updatedFlows = flows.map((f) => (f.id === flow.id ? updatedFlow : f));
+    localStorage.setItem("flows", JSON.stringify(updatedFlows));
+
+    setFlow(updatedFlow);
+    setCurrentPageIndex(updatedFlow.pages.length - 1);
+  };
 
   const handleAddQuestion = (question: Question) => {
     if (!flow) return;
 
-    const updatedFlow = {
+    const updatedPages = flow.pages.map((page, index) => {
+      if (index === currentPageIndex) {
+        return {
+          ...page,
+          questions: [...page.questions, question],
+        };
+      }
+      return page;
+    });
+
+    const updatedFlow: Flow = {
       ...flow,
-      questions: [...flow.questions, question],
+      pages: updatedPages,
     };
 
-    const flows = JSON.parse(localStorage.getItem('flows') || '[]') as Flow[];
+    const flows = JSON.parse(localStorage.getItem("flows") || "[]") as Flow[];
     const updatedFlows = flows.map((f) => (f.id === flow.id ? updatedFlow : f));
-    localStorage.setItem('flows', JSON.stringify(updatedFlows));
+    localStorage.setItem("flows", JSON.stringify(updatedFlows));
 
     setFlow(updatedFlow);
   };
@@ -62,63 +117,119 @@ export default function FlowEditor() {
     <div className="flex">
       <LeftNavBar onQuestionTypeChange={setQuestionType} />
       <div className="ml-48 p-6 w-full">
-        <h1 className="text-2xl font-bold mb-4">{isPreview ? `Preview: ${flow.name}` : `Editing Flow: ${flow.name}`}</h1>
+        <h1 className="text-2xl font-bold mb-4">
+          {isPreview ? `Preview: ${flow.name}` : `Editing Flow: ${flow.name}`}
+        </h1>
         <p className="text-gray-600 mb-6">{flow.description}</p>
+
+        {/* Page Navigation */}
+        <div className="flex space-x-2 mb-4">
+          {flow.pages.map((page, index) => (
+            <button
+              key={page.id}
+              onClick={() => setCurrentPageIndex(index)}
+              className={`px-3 py-1 rounded ${
+                currentPageIndex === index
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200"
+              }`}
+            >
+              {page.name}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={handleAddPage}
+            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+          >
+            Tilføj ny side
+          </button>
+        </div>
 
         {!isPreview ? (
           <>
-            {questionType === 'number' ? (
+            {questionType === "number" ? (
               <NumericQuestion onAddQuestion={handleAddQuestion} />
             ) : (
               <TextQuestion onAddQuestion={handleAddQuestion} />
             )}
-            <h2 className="text-xl font-semibold mt-6">Questions</h2>
+            <h2 className="text-xl font-semibold mt-6">
+              Spørgsmål på side {flow.pages[currentPageIndex]?.name}
+            </h2>
             <ul className="space-y-4">
-              {flow.questions.map((q, index) => (
-                <li key={index} className="border p-4 rounded shadow-sm bg-gray-50">
+              {flow.pages[currentPageIndex]?.questions.map((q, index) => (
+                <li
+                  key={index}
+                  className="border p-4 rounded shadow-sm bg-gray-50"
+                >
                   <p className="font-medium">{q.text}</p>
-                  <p>Type: {q.inputType === 'number' ? 'Numeric Input' : 'Text Input'}</p>
-                  {q.inputType === 'number' && (
+                  <p>
+                    Type:{" "}
+                    {q.inputType === "number" ? "Numeric Input" : "Text Input"}
+                  </p>
+                  {q.inputType === "number" && (
                     <>
-                      <p>Min: {q.min ?? 'None'}, Max: {q.max ?? 'None'}</p>
-                      <p>Low Outcome: {q.lowOutcome ?? 'None'}, High Outcome: {q.highOutcome ?? 'None'}</p>
+                      <p>
+                        Min: {q.min ?? "None"}, Max: {q.max ?? "None"}
+                      </p>
+                      <p>
+                        Low Outcome: {q.lowOutcome ?? "None"}, High Outcome:{" "}
+                        {q.highOutcome ?? "None"}
+                      </p>
                     </>
                   )}
-                  {q.inputType === 'text' && <p>Placeholder: {q.placeholder ?? 'None'}</p>}
+                  {q.inputType === "text" && (
+                    <p>Placeholder: {q.placeholder ?? "None"}</p>
+                  )}
                 </li>
               ))}
             </ul>
           </>
         ) : (
           <>
-            <h2 className="text-xl font-semibold mb-4">Questions</h2>
+            <h2 className="text-xl font-semibold mb-4">
+              Questions in {flow.pages[currentPageIndex]?.name}
+            </h2>
             <ul className="space-y-4">
-              {flow.questions.map((q, index) => (
-                <li key={index} className="border p-4 rounded shadow-sm bg-gray-50">
+              {flow.pages[currentPageIndex]?.questions.map((q, index) => (
+                <li
+                  key={index}
+                  className="border p-4 rounded shadow-sm bg-gray-50"
+                >
                   <p className="font-medium">{q.text}</p>
-                  {q.inputType === 'number' ? (
+                  {q.inputType === "number" ? (
                     <div className="mt-2">
                       <input
                         type="number"
-                        onChange={(e) => handleAnswerChange(index, Number(e.target.value))}
+                        onChange={(e) =>
+                          handleAnswerChange(index, Number(e.target.value))
+                        }
                         className="border p-2 rounded w-full"
                       />
-                      {typeof previewAnswers[index] === 'number' && (
+                      {typeof previewAnswers[index] === "number" && (
                         <>
-                          {q.min !== undefined && previewAnswers[index] < q.min && (
-                            <p className="text-red-500 mt-2">{q.lowOutcome}</p>
-                          )}
-                          {q.max !== undefined && previewAnswers[index] > q.max && (
-                            <p className="text-red-500 mt-2">{q.highOutcome}</p>
-                          )}
+                          {q.min !== undefined &&
+                            (previewAnswers[index] as number) < q.min && (
+                              <p className="text-red-500 mt-2">
+                                {q.lowOutcome}
+                              </p>
+                            )}
+                          {q.max !== undefined &&
+                            (previewAnswers[index] as number) > q.max && (
+                              <p className="text-red-500 mt-2">
+                                {q.highOutcome}
+                              </p>
+                            )}
                         </>
                       )}
                     </div>
                   ) : (
                     <input
                       type="text"
-                      placeholder={q.placeholder ?? ''}
-                      onChange={(e) => handleAnswerChange(index, e.target.value)}
+                      placeholder={q.placeholder ?? ""}
+                      onChange={(e) =>
+                        handleAnswerChange(index, e.target.value)
+                      }
                       className="border p-2 rounded w-full"
                     />
                   )}
@@ -132,25 +243,9 @@ export default function FlowEditor() {
           onClick={() => setIsPreview(!isPreview)}
           className="bg-blue-500 text-white px-4 py-2 rounded mt-6 hover:bg-blue-600"
         >
-          {isPreview ? 'Exit Preview Mode' : 'Enter Preview Mode'}
+          {isPreview ? "Exit Preview Mode" : "Enter Preview Mode"}
         </button>
       </div>
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
