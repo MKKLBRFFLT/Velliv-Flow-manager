@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function HomePage() {
-  const [flowName, setFlowName] = useState<string>('');
-  const [flowDescription, setFlowDescription] = useState<string>('');
+  const [flowName, setFlowName] = useState<string>("");
+  const [flowDescription, setFlowDescription] = useState<string>("");
   const router = useRouter();
 
   const handleCreateFlow = (e: React.FormEvent) => {
@@ -13,12 +13,23 @@ export default function HomePage() {
     if (!flowName) return;
 
     const flowId = Date.now().toString();
-    const newFlow = { id: flowId, name: flowName, description: flowDescription, questions: [] };
+    const newFlow = {
+      id: flowId,
+      name: flowName,
+      description: flowDescription,
+      questions: [],
+      pages: [],
+    };
 
     // Save the flow in local storage
-    const flows = JSON.parse(localStorage.getItem('flows') || '[]') as Array<{ id: string; name: string; description: string; questions: any[] }>;
+    const flows = JSON.parse(localStorage.getItem("flows") || "[]") as Array<{
+      id: string;
+      name: string;
+      description: string;
+      questions: any[];
+    }>;
     flows.push(newFlow);
-    localStorage.setItem('flows', JSON.stringify(flows));
+    localStorage.setItem("flows", JSON.stringify(flows));
 
     // Log the flow details
     console.log(JSON.stringify(newFlow, null, 2));
@@ -28,7 +39,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className='ml-48 p-6'>
+    <div className="ml-48 p-6">
       <h1>Create a New Flow</h1>
       <form onSubmit={handleCreateFlow}>
         <input
@@ -43,12 +54,10 @@ export default function HomePage() {
           onChange={(e) => setFlowDescription(e.target.value)}
           className="mt-4"
         />
-        <button type="submit" className="mt-4">Create Flow</button>
+        <button type="submit" className="mt-4">
+          Create Flow
+        </button>
       </form>
     </div>
   );
 }
-
-
-
-
