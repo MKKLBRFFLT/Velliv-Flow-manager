@@ -124,19 +124,58 @@ export default function FlowEditor() {
 
         {/* Page Navigation */}
         <div className="flex space-x-2 mb-4">
-          {flow.pages.map((page, index) => (
-            <button
-              key={page.id}
-              onClick={() => setCurrentPageIndex(index)}
-              className={`px-3 py-1 rounded ${
-                currentPageIndex === index
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200"
-              }`}
-            >
-              {page.name}
-            </button>
-          ))}
+          <button
+            onClick={() => setCurrentPageIndex(0)}
+            disabled={currentPageIndex === 0}
+            className={`px-3 py-1 rounded ${
+              currentPageIndex === 0
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-gray-200 hover:bg-gray-300"
+            }`}
+          >
+            Første side
+          </button>
+
+          <button
+            onClick={() => setCurrentPageIndex(currentPageIndex - 1)}
+            disabled={currentPageIndex === 0}
+            className={`px-3 py-1 rounded ${
+              currentPageIndex === 0
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-gray-200 hover:bg-gray-300"
+            }`}
+          >
+            Forrige side
+          </button>
+
+          <span className="px-3 py-1 rounded bg-blue-500 text-white">
+            Side {currentPageIndex + 1} of {flow.pages.length}
+          </span>
+
+          <button
+            onClick={() => setCurrentPageIndex(currentPageIndex + 1)}
+            disabled={currentPageIndex === flow.pages.length - 1}
+            className={`px-3 py-1 rounded ${
+              currentPageIndex === flow.pages.length - 1
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-gray-200 hover:bg-gray-300"
+            }`}
+          >
+            Næste side
+          </button>
+
+          <button
+            onClick={() => setCurrentPageIndex(flow.pages.length - 1)}
+            disabled={currentPageIndex === flow.pages.length - 1}
+            className={`px-3 py-1 rounded ${
+              currentPageIndex === flow.pages.length - 1
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-gray-200 hover:bg-gray-300"
+            }`}
+          >
+            Sidste side
+          </button>
+
           <button
             type="button"
             onClick={handleAddPage}
@@ -188,7 +227,7 @@ export default function FlowEditor() {
         ) : (
           <>
             <h2 className="text-xl font-semibold mb-4">
-              Questions in {flow.pages[currentPageIndex]?.name}
+              Spørgsmål {flow.pages[currentPageIndex]?.name}
             </h2>
             <ul className="space-y-4">
               {flow.pages[currentPageIndex]?.questions.map((q, index) => (
