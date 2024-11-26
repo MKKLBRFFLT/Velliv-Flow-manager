@@ -2,7 +2,7 @@
 import Link from 'next/link';
 
 type LeftNavBarProps = {
-  onQuestionTypeChange: (type: 'number' | 'text') => void;
+  onQuestionTypeChange: (type: 'number' | 'text' | 'checkbox' | 'calendar'  | 'dropdown') => void;
 };
 
 export default function LeftNavBar({ onQuestionTypeChange }: LeftNavBarProps) {
@@ -13,6 +13,9 @@ export default function LeftNavBar({ onQuestionTypeChange }: LeftNavBarProps) {
       <div className="flex flex-col text-xl space-y-4 text-white">
         <button onClick={() => onQuestionTypeChange('number')}>Numeric Question</button>
         <button onClick={() => onQuestionTypeChange('text')}>Text Question</button>
+        <button onClick={() => onQuestionTypeChange('checkbox')}>Checkbox Question</button>
+        <button onClick={() => onQuestionTypeChange('calendar')}>Calendar Question</button>
+        <button onClick={() => onQuestionTypeChange('dropdown')}>Dropdown Question</button>
         <button>Værktøj 3</button>
         <button>Værktøj 4</button>
       </div>
