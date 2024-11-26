@@ -111,7 +111,7 @@ export default function FlowEditor() {
     setPreviewAnswers((prev) => ({ ...prev, [index]: value }));
   };
 
-  if (flow?.pages?.length < 1) {
+  if ((flow?.pages?.length ?? 0) < 1) {
     handleAddPage();
   }
 
