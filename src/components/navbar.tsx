@@ -2,7 +2,7 @@
 import Link from 'next/link';
 
 type LeftNavBarProps = {
-  onQuestionTypeChange: (type: 'number' | 'text') => void;
+  onQuestionTypeChange: (type: 'number' | 'text' | 'multiple-choice') => void;
 };
 
 export default function LeftNavBar({ onQuestionTypeChange }: LeftNavBarProps) {
@@ -13,12 +13,12 @@ export default function LeftNavBar({ onQuestionTypeChange }: LeftNavBarProps) {
       <div className="flex flex-col text-xl space-y-4 text-white">
         <button onClick={() => onQuestionTypeChange('number')}>Numeric Question</button>
         <button onClick={() => onQuestionTypeChange('text')}>Text Question</button>
-        <button>Værktøj 3</button>
-        <button>Værktøj 4</button>
+        <button onClick={() => onQuestionTypeChange('multiple-choice')}>Multiple Choice Question</button>
       </div>
     </nav>
   );
 }
+
 
 
 
