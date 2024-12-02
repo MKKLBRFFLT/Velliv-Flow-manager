@@ -3,7 +3,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 type LeftNavBarProps = {
-  onQuestionTypeChange: (type: "number" | "text") => void;
+
+  onQuestionTypeChange: (type: "number" | "text" | "multiple-choice") => void;
   flowName?: string;
 };
 
@@ -44,6 +45,9 @@ export default function LeftNavBar({
           </button>
           <button onClick={() => onQuestionTypeChange?.("text")}>
             Text Question
+          </button>
+          <button onClick={() => onQuestionTypeChange('multiple-choice')}>
+            Multiple Choice Question
           </button>
           <button>Værktøj 3</button>
           <button>Værktøj 4</button>
