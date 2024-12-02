@@ -119,7 +119,7 @@ export default function FlowEditor() {
 
   return (
     <div className="flex">
-      <LeftNavBar onQuestionTypeChange={setQuestionType} />
+      <LeftNavBar onQuestionTypeChange={setQuestionType} flowName={flow.name} />
       <div className="ml-48 p-6 w-full">
         <h1 className="text-2xl font-bold mb-4">
           {isPreview ? `Preview: ${flow.name}` : `Editing Flow: ${flow.name}`}

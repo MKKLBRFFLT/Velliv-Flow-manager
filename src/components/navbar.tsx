@@ -4,19 +4,39 @@ import { usePathname } from "next/navigation";
 
 type LeftNavBarProps = {
   onQuestionTypeChange: (type: "number" | "text") => void;
+  flowName?: string;
 };
 
-export default function LeftNavBar({ onQuestionTypeChange }: LeftNavBarProps) {
+export default function LeftNavBar({
+  onQuestionTypeChange,
+  flowName,
+}: LeftNavBarProps) {
   const pathname = usePathname();
 
   const isEditingFlow = pathname.startsWith("/flow/");
+
+  const handleNavAway = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const confirmation = window.confirm(
+      `Er du sikker på du vil forlade flowet: "${flowName}"?`
+    );
+    if (!confirmation) {
+      e.preventDefault();
+    }
+  };
+
   return (
     <nav
       className="fixed left-0 top-0 h-full w-48 flex flex-col items-start p-6 space-y-4"
       style={{ backgroundColor: "#006e64" }}
     >
       <h1 className="text-white">Tools</h1>
-      <Link href="/">Home</Link>
+      <Link
+        href="/"
+        className="text-white hover:underline"
+        onClick={isEditingFlow && flowName ? handleNavAway : undefined}
+      >
+        Home
+      </Link>
       {isEditingFlow && (
         <div className="flex flex-col text-xl space-y-4 text-white">
           <button onClick={() => onQuestionTypeChange?.("number")}>
