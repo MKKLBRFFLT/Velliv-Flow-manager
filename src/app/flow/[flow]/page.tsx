@@ -40,8 +40,8 @@ export default function FlowEditor() {
   const params = useParams();
   const [flow, setFlow] = useState<Flow | null>(null);
   const [questionType, setQuestionType] = useState<
-  "number" | "text" | "multiple-choice" | "checkbox" | "calendar" | "dropdown"
->("number");
+  'number' | 'text' | 'multiple-choice' | 'checkbox' | 'calendar' | 'dropdown'
+>('number');
   const [isPreview, setIsPreview] = useState<boolean>(false);
   const [previewAnswers, setPreviewAnswers] = useState<
     Record<number, string | number | string[]>
@@ -199,19 +199,20 @@ export default function FlowEditor() {
 
         {!isPreview ? (
           <>
-            {questionType === "number" ? (
-              <NumericQuestion onAddQuestion={handleAddQuestion} />
-            ) : questionType === "text" ? (
-              <TextQuestion onAddQuestion={handleAddQuestion} />
-            ) : questionType === "checkbox" ? (
-              <CheckboxQuestion onAddQuestion={handleAddQuestion} />
-            ) : questionType === "calendar" ? (
-              <CalendarQuestion onAddQuestion={handleAddQuestion} />
-            ) : questionType === "dropdown" ? (
-              <DropdownQuestion onAddQuestion={handleAddQuestion} />
-            ) : (
-              <MultipleChoiceQuestion onAddQuestion={handleAddQuestion} />
-            )}
+          {questionType === "number" ? (
+        <NumericQuestion onAddQuestion={handleAddQuestion} />
+      ) : questionType === "text" ? (
+        <TextQuestion onAddQuestion={handleAddQuestion} />
+      ) : questionType === "multiple-choice" ? (
+        <MultipleChoiceQuestion onAddQuestion={handleAddQuestion} />
+      ) : questionType === "checkbox" ? (
+        <CheckboxQuestion onAddQuestion={handleAddQuestion} />
+      ) : questionType === "calendar" ? (
+        <CalendarQuestion onAddQuestion={handleAddQuestion} />
+      ) : questionType === "dropdown" ? (
+        <DropdownQuestion onAddQuestion={handleAddQuestion} />
+            ) : null
+            }
             <h2 className="text-xl font-semibold mt-6">
               Spørgsmål på side {flow.pages[currentPageIndex]?.name}
             </h2>
@@ -245,6 +246,7 @@ export default function FlowEditor() {
   {/* handling for multiple-choice */}
   {q.inputType === "multiple-choice" && (
     <ul className="space-y-2">
+      
       {q.answers?.map((answer, answerIndex) => (
         <li key={answerIndex} className="border p-2 rounded">
           {answer}
@@ -332,8 +334,38 @@ export default function FlowEditor() {
                 ) : q.inputType === "multiple-choice" ? (
                   // handling for multiple-choice
                   <div className="mt-2">
-                    {/* multiple-choice options */}
-                  </div>
+                  {q.answers?.map((answer, answerIndex) => (
+                    <button
+                      key={answerIndex}
+                      onClick={() => {
+                        if (q.allowMultipleAnswers) {
+                          const currentAnswers = Array.isArray(
+                            previewAnswers[index]
+                          )
+                            ? (previewAnswers[index] as string[])
+                            : [];
+                          const newAnswers = currentAnswers.includes(
+                            answer
+                          )
+                            ? currentAnswers.filter((a) => a !== answer)
+                            : [...currentAnswers, answer];
+                          handleAnswerChange(index, newAnswers);
+                        } else {
+                          handleAnswerChange(index, answer);
+                        }
+                      }}
+                      className={`border p-2 rounded w-full text-left ${
+                        (Array.isArray(previewAnswers[index]) &&
+                          previewAnswers[index].includes(answer)) ||
+                        previewAnswers[index] === answer
+                          ? "bg-blue-100"
+                          : ""
+                      }`}
+                    >
+                      {answer}
+                    </button>
+                  ))}
+                </div>
                 ) : q.inputType === "checkbox" ? (
                   // handling for checkbox input
                   <div className="mt-2">

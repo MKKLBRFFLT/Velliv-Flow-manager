@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 
 type LeftNavBarProps = {
   onQuestionTypeChange: (type: 'number' | 'text' | 'checkbox' | 'calendar' | 'multiple-choice' | 'dropdown') => void;
-  flowName?: string; // Add this line
+  flowName?: string; 
 };
 
 export default function LeftNavBar({
@@ -32,13 +32,12 @@ export default function LeftNavBar({
       <h1 className="text-white">Tools</h1>
       <Link href="/">Home</Link>
       <div className="flex flex-col text-xl space-y-4 text-white">
-        <button onClick={() => onQuestionTypeChange('number')}>Numeric Question</button>
-        <button onClick={() => onQuestionTypeChange('text')}>Text Question</button>
-        <button onClick={() => onQuestionTypeChange('checkbox')}>Checkbox Question</button>
-        <button onClick={() => onQuestionTypeChange('calendar')}>Calendar Question</button>
-        <button onClick={() => onQuestionTypeChange('dropdown')}>Dropdown Question</button>
-        <button>Værktøj 3</button>
-        <button>Værktøj 4</button>
+  <button onClick={() => onQuestionTypeChange('number')}>Numeric Question</button>
+  <button onClick={() => onQuestionTypeChange('text')}>Text Question</button>
+  <button onClick={() => onQuestionTypeChange('multiple-choice')}>Multiple Choice Question</button>
+  <button onClick={() => onQuestionTypeChange('checkbox')}>Checkbox Question</button>
+  <button onClick={() => onQuestionTypeChange('calendar')}>Calendar Question</button>
+  <button onClick={() => onQuestionTypeChange('dropdown')}>Dropdown Question</button>
       </div>
     </nav>
   );
