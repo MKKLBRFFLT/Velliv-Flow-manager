@@ -49,8 +49,6 @@ export default function LeftNavBar({
           <button onClick={() => onQuestionTypeChange('multiple-choice')}>
             Multiple Choice Question
           </button>
-          <button>Værktøj 3</button>
-          <button>Værktøj 4</button>
         </div>
       )}
     </nav>
