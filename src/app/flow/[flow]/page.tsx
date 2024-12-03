@@ -1,19 +1,22 @@
-"use client";
+'use client';
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import LeftNavBar from "../../../components/navbar";
 import NumericQuestion from "../../../components/NumericQuestion";
 import TextQuestion from "../../../components/TextQuestion";
+import MultipleChoiceQuestion from "../../../components/MultipleChoiceQuestion";
 
 type Question = {
   text: string;
-  inputType: "number" | "text";
+  inputType: "number" | "text" | "multiple-choice";
   min?: number;
   max?: number;
   lowOutcome?: string;
   highOutcome?: string;
   placeholder?: string;
+  answers?: string[];
+  allowMultipleAnswers?: boolean;
 };
 
 type Page = {
@@ -26,17 +29,18 @@ type Flow = {
   id: string;
   name: string;
   description: string;
-  questions: Question[];
   pages: Page[];
 };
 
 export default function FlowEditor() {
   const params = useParams();
   const [flow, setFlow] = useState<Flow | null>(null);
-  const [questionType, setQuestionType] = useState<"number" | "text">("number");
+  const [questionType, setQuestionType] = useState<
+    "number" | "text" | "multiple-choice"
+  >("number");
   const [isPreview, setIsPreview] = useState<boolean>(false);
   const [previewAnswers, setPreviewAnswers] = useState<
-    Record<number, string | number>
+    Record<number, string | number | string[]>
   >({});
   const [currentPageIndex, setCurrentPageIndex] = useState<number>(0);
 
@@ -107,7 +111,7 @@ export default function FlowEditor() {
     setFlow(updatedFlow);
   };
 
-  const handleAnswerChange = (index: number, value: string | number) => {
+  const handleAnswerChange = (index: number, value: string | number | string[]) => {
     setPreviewAnswers((prev) => ({ ...prev, [index]: value }));
   };
 
@@ -119,7 +123,7 @@ export default function FlowEditor() {
 
   return (
     <div className="flex">
-      <LeftNavBar onQuestionTypeChange={setQuestionType} />
+      <LeftNavBar onQuestionTypeChange={setQuestionType} flowName={flow.name} />
       <div className="ml-48 p-6 w-full">
         <h1 className="text-2xl font-bold mb-4">
           {isPreview ? `Preview: ${flow.name}` : `Editing Flow: ${flow.name}`}
@@ -193,8 +197,10 @@ export default function FlowEditor() {
           <>
             {questionType === "number" ? (
               <NumericQuestion onAddQuestion={handleAddQuestion} />
-            ) : (
+            ) : questionType === "text" ? (
               <TextQuestion onAddQuestion={handleAddQuestion} />
+            ) : (
+              <MultipleChoiceQuestion onAddQuestion={handleAddQuestion} />
             )}
             <h2 className="text-xl font-semibold mt-6">
               Spørgsmål på side {flow.pages[currentPageIndex]?.name}
@@ -208,7 +214,11 @@ export default function FlowEditor() {
                   <p className="font-medium">{q.text}</p>
                   <p>
                     Type:{" "}
-                    {q.inputType === "number" ? "Numeric Input" : "Text Input"}
+                    {q.inputType === "number"
+                      ? "Numeric Input"
+                      : q.inputType === "text"
+                      ? "Text Input"
+                      : "Multiple Choice"}
                   </p>
                   {q.inputType === "number" && (
                     <>
@@ -223,6 +233,19 @@ export default function FlowEditor() {
                   )}
                   {q.inputType === "text" && (
                     <p>Placeholder: {q.placeholder ?? "None"}</p>
+                  )}
+                  {q.inputType === "multiple-choice" && (
+                    <ul className="space-y-2">
+                      {q.answers?.map((answer, answerIndex) => (
+                        <li key={answerIndex} className="border p-2 rounded">
+                          {answer}
+                        </li>
+                      ))}
+                      <p>
+                        Allow Multiple Answers:{" "}
+                        {q.allowMultipleAnswers ? "Yes" : "No"}
+                      </p>
+                    </ul>
                   )}
                 </li>
               ))}
@@ -266,7 +289,7 @@ export default function FlowEditor() {
                         </>
                       )}
                     </div>
-                  ) : (
+                  ) : q.inputType === "text" ? (
                     <input
                       type="text"
                       placeholder={q.placeholder ?? ""}
@@ -275,6 +298,40 @@ export default function FlowEditor() {
                       }
                       className="border p-2 rounded w-full"
                     />
+                  ) : (
+                    <div className="mt-2">
+                      {q.answers?.map((answer, answerIndex) => (
+                        <button
+                          key={answerIndex}
+                          onClick={() => {
+                            if (q.allowMultipleAnswers) {
+                              const currentAnswers = Array.isArray(
+                                previewAnswers[index]
+                              )
+                                ? (previewAnswers[index] as string[])
+                                : [];
+                              const newAnswers = currentAnswers.includes(
+                                answer
+                              )
+                                ? currentAnswers.filter((a) => a !== answer)
+                                : [...currentAnswers, answer];
+                              handleAnswerChange(index, newAnswers);
+                            } else {
+                              handleAnswerChange(index, answer);
+                            }
+                          }}
+                          className={`border p-2 rounded w-full text-left ${
+                            (Array.isArray(previewAnswers[index]) &&
+                              previewAnswers[index].includes(answer)) ||
+                            previewAnswers[index] === answer
+                              ? "bg-blue-100"
+                              : ""
+                          }`}
+                        >
+                          {answer}
+                        </button>
+                      ))}
+                    </div>
                   )}
                 </li>
               ))}
@@ -292,3 +349,4 @@ export default function FlowEditor() {
     </div>
   );
 }
+
