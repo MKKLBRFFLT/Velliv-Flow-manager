@@ -6,10 +6,13 @@ import LeftNavBar from "../../../components/navbar";
 import NumericQuestion from "../../../components/NumericQuestion";
 import TextQuestion from "../../../components/TextQuestion";
 import MultipleChoiceQuestion from "../../../components/MultipleChoiceQuestion";
+import CheckboxQuestion from "../../../components/CheckboxQuestion";
+import CalendarQuestion from "../../../components/CalendarQuestion";
+import DropdownQuestion from "../../../components/DropdownQuestion";
 
 type Question = {
   text: string;
-  inputType: "number" | "text" | "multiple-choice";
+  inputType: "number" | "text" | "multiple-choice" | "checkbox" | "calendar" | "dropdown";
   min?: number;
   max?: number;
   lowOutcome?: string;
@@ -17,6 +20,7 @@ type Question = {
   placeholder?: string;
   answers?: string[];
   allowMultipleAnswers?: boolean;
+  options?: string[];
 };
 
 type Page = {
@@ -36,8 +40,8 @@ export default function FlowEditor() {
   const params = useParams();
   const [flow, setFlow] = useState<Flow | null>(null);
   const [questionType, setQuestionType] = useState<
-    "number" | "text" | "multiple-choice"
-  >("number");
+  'number' | 'text' | 'multiple-choice' | 'checkbox' | 'calendar' | 'dropdown'
+>('number');
   const [isPreview, setIsPreview] = useState<boolean>(false);
   const [previewAnswers, setPreviewAnswers] = useState<
     Record<number, string | number | string[]>
@@ -195,59 +199,100 @@ export default function FlowEditor() {
 
         {!isPreview ? (
           <>
-            {questionType === "number" ? (
-              <NumericQuestion onAddQuestion={handleAddQuestion} />
-            ) : questionType === "text" ? (
-              <TextQuestion onAddQuestion={handleAddQuestion} />
-            ) : (
-              <MultipleChoiceQuestion onAddQuestion={handleAddQuestion} />
-            )}
+          {questionType === "number" ? (
+        <NumericQuestion onAddQuestion={handleAddQuestion} />
+      ) : questionType === "text" ? (
+        <TextQuestion onAddQuestion={handleAddQuestion} />
+      ) : questionType === "multiple-choice" ? (
+        <MultipleChoiceQuestion onAddQuestion={handleAddQuestion} />
+      ) : questionType === "checkbox" ? (
+        <CheckboxQuestion onAddQuestion={handleAddQuestion} />
+      ) : questionType === "calendar" ? (
+        <CalendarQuestion onAddQuestion={handleAddQuestion} />
+      ) : questionType === "dropdown" ? (
+        <DropdownQuestion onAddQuestion={handleAddQuestion} />
+            ) : null
+            }
             <h2 className="text-xl font-semibold mt-6">
               Spørgsmål på side {flow.pages[currentPageIndex]?.name}
             </h2>
             <ul className="space-y-4">
               {flow.pages[currentPageIndex]?.questions.map((q, index) => (
                 <li
-                  key={index}
-                  className="border p-4 rounded shadow-sm bg-gray-50"
-                >
-                  <p className="font-medium">{q.text}</p>
-                  <p>
-                    Type:{" "}
-                    {q.inputType === "number"
-                      ? "Numeric Input"
-                      : q.inputType === "text"
-                      ? "Text Input"
-                      : "Multiple Choice"}
-                  </p>
-                  {q.inputType === "number" && (
-                    <>
-                      <p>
-                        Min: {q.min ?? "None"}, Max: {q.max ?? "None"}
-                      </p>
-                      <p>
-                        Low Outcome: {q.lowOutcome ?? "None"}, High Outcome:{" "}
-                        {q.highOutcome ?? "None"}
-                      </p>
-                    </>
-                  )}
-                  {q.inputType === "text" && (
-                    <p>Placeholder: {q.placeholder ?? "None"}</p>
-                  )}
-                  {q.inputType === "multiple-choice" && (
-                    <ul className="space-y-2">
-                      {q.answers?.map((answer, answerIndex) => (
-                        <li key={answerIndex} className="border p-2 rounded">
-                          {answer}
-                        </li>
-                      ))}
-                      <p>
-                        Allow Multiple Answers:{" "}
-                        {q.allowMultipleAnswers ? "Yes" : "No"}
-                      </p>
-                    </ul>
-                  )}
-                </li>
+  key={index}
+  className="border p-4 rounded shadow-sm bg-gray-50"
+>
+  <p className="font-medium">{q.text}</p>
+  <p>Type: {q.inputType}</p>
+
+  {/* handling for number input */}
+  {q.inputType === "number" && (
+    <>
+      <p>
+        Min: {q.min ?? "None"}, Max: {q.max ?? "None"}
+      </p>
+      <p>
+        Low Outcome: {q.lowOutcome ?? "None"}, High Outcome:{" "}
+        {q.highOutcome ?? "None"}
+      </p>
+    </>
+  )}
+
+  {/* handling for text input */}
+  {q.inputType === "text" && (
+    <p>Placeholder: {q.placeholder ?? "None"}</p>
+  )}
+
+  {/* handling for multiple-choice */}
+  {q.inputType === "multiple-choice" && (
+    <ul className="space-y-2">
+      
+      {q.answers?.map((answer, answerIndex) => (
+        <li key={answerIndex} className="border p-2 rounded">
+          {answer}
+        </li>
+      ))}
+      <p>
+        Allow Multiple Answers:{" "}
+        {q.allowMultipleAnswers ? "Yes" : "No"}
+      </p>
+    </ul>
+  )}
+
+  {/* handling for checkbox input */}
+  {q.inputType === "checkbox" && (
+    <>
+      <p>Options:</p>
+      <ul className="space-y-2">
+        {q.options?.map((option, optionIndex) => (
+          <li key={optionIndex} className="border p-2 rounded">
+            {option}
+          </li>
+        ))}
+      </ul>
+    </>
+  )}
+
+  {/* handling for dropdown input */}
+  {q.inputType === "dropdown" && (
+    <>
+      <p>Options:</p>
+      <ul className="space-y-2">
+        {q.options?.map((option, optionIndex) => (
+          <li key={optionIndex} className="border p-2 rounded">
+            {option}
+          </li>
+        ))}
+      </ul>
+    </>
+  )}
+
+  {/* handling for calendar input */}
+  {q.inputType === "calendar" && (
+    <p>This is a calendar question.</p>
+
+  )}
+</li>
               ))}
             </ul>
           </>
@@ -259,81 +304,120 @@ export default function FlowEditor() {
             <ul className="space-y-4">
               {flow.pages[currentPageIndex]?.questions.map((q, index) => (
                 <li
-                  key={index}
-                  className="border p-4 rounded shadow-sm bg-gray-50"
-                >
-                  <p className="font-medium">{q.text}</p>
-                  {q.inputType === "number" ? (
-                    <div className="mt-2">
-                      <input
-                        type="number"
-                        onChange={(e) =>
-                          handleAnswerChange(index, Number(e.target.value))
-                        }
-                        className="border p-2 rounded w-full"
-                      />
-                      {typeof previewAnswers[index] === "number" && (
-                        <>
-                          {q.min !== undefined &&
-                            (previewAnswers[index] as number) < q.min && (
-                              <p className="text-red-500 mt-2">
-                                {q.lowOutcome}
-                              </p>
-                            )}
-                          {q.max !== undefined &&
-                            (previewAnswers[index] as number) > q.max && (
-                              <p className="text-red-500 mt-2">
-                                {q.highOutcome}
-                              </p>
-                            )}
-                        </>
-                      )}
-                    </div>
-                  ) : q.inputType === "text" ? (
+                key={index}
+                className="border p-4 rounded shadow-sm bg-gray-50"
+              >
+                <p className="font-medium">{q.text}</p>
+              
+                {q.inputType === "number" ? (
+                  // handling for number input
+                  <div className="mt-2">
                     <input
-                      type="text"
-                      placeholder={q.placeholder ?? ""}
+                      type="number"
                       onChange={(e) =>
-                        handleAnswerChange(index, e.target.value)
+                        handleAnswerChange(index, Number(e.target.value))
                       }
                       className="border p-2 rounded w-full"
                     />
-                  ) : (
-                    <div className="mt-2">
-                      {q.answers?.map((answer, answerIndex) => (
-                        <button
-                          key={answerIndex}
-                          onClick={() => {
-                            if (q.allowMultipleAnswers) {
-                              const currentAnswers = Array.isArray(
-                                previewAnswers[index]
-                              )
-                                ? (previewAnswers[index] as string[])
-                                : [];
-                              const newAnswers = currentAnswers.includes(
-                                answer
-                              )
-                                ? currentAnswers.filter((a) => a !== answer)
-                                : [...currentAnswers, answer];
-                              handleAnswerChange(index, newAnswers);
+                    {/* validation message */}
+                  </div>
+                ) : q.inputType === "text" ? (
+                  // handling for text input
+                  <input
+                    type="text"
+                    placeholder={q.placeholder ?? ""}
+                    onChange={(e) =>
+                      handleAnswerChange(index, e.target.value)
+                    }
+                    className="border p-2 rounded w-full"
+                  />
+                ) : q.inputType === "multiple-choice" ? (
+                  // handling for multiple-choice
+                  <div className="mt-2">
+                  {q.answers?.map((answer, answerIndex) => (
+                    <button
+                      key={answerIndex}
+                      onClick={() => {
+                        if (q.allowMultipleAnswers) {
+                          const currentAnswers = Array.isArray(
+                            previewAnswers[index]
+                          )
+                            ? (previewAnswers[index] as string[])
+                            : [];
+                          const newAnswers = currentAnswers.includes(
+                            answer
+                          )
+                            ? currentAnswers.filter((a) => a !== answer)
+                            : [...currentAnswers, answer];
+                          handleAnswerChange(index, newAnswers);
+                        } else {
+                          handleAnswerChange(index, answer);
+                        }
+                      }}
+                      className={`border p-2 rounded w-full text-left ${
+                        (Array.isArray(previewAnswers[index]) &&
+                          previewAnswers[index].includes(answer)) ||
+                        previewAnswers[index] === answer
+                          ? "bg-blue-100"
+                          : ""
+                      }`}
+                    >
+                      {answer}
+                    </button>
+                  ))}
+                </div>
+                ) : q.inputType === "checkbox" ? (
+                  // handling for checkbox input
+                  <div className="mt-2">
+                    {q.options?.map((option, optionIndex) => (
+                      <label key={optionIndex} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          value={option}
+                          onChange={(e) => {
+                            const selectedOptions = Array.isArray(previewAnswers[index])
+                              ? (previewAnswers[index] as string[])
+                              : [];
+                            if (e.target.checked) {
+                              handleAnswerChange(index, [...selectedOptions, option]);
                             } else {
-                              handleAnswerChange(index, answer);
+                              handleAnswerChange(
+                                index,
+                                selectedOptions.filter((opt) => opt !== option)
+                              );
                             }
                           }}
-                          className={`border p-2 rounded w-full text-left ${
-                            (Array.isArray(previewAnswers[index]) &&
-                              previewAnswers[index].includes(answer)) ||
-                            previewAnswers[index] === answer
-                              ? "bg-blue-100"
-                              : ""
-                          }`}
-                        >
-                          {answer}
-                        </button>
+                        />
+                        <span className="ml-2">{option}</span>
+                      </label>
+                    ))}
+                  </div>
+                ) : q.inputType === "dropdown" ? (
+                  // handling for dropdown input
+                  <div className="mt-2">
+                    <select
+                      onChange={(e) => handleAnswerChange(index, e.target.value)}
+                      className="border p-2 rounded w-full"
+                    >
+                      <option value="">Select an option</option>
+                      {q.options?.map((option, optionIndex) => (
+                        <option key={optionIndex} value={option}>
+                          {option}
+                        </option>
                       ))}
-                    </div>
-                  )}
-                </li>
+                    </select>
+                  </div>
+                ) : q.inputType === "calendar" ? (
+                  // handling for calendar input
+                  <div className="mt-2">
+                    <input
+                      type="date"
+                      onChange={(e) => handleAnswerChange(index, e.target.value)}
+                      className="border p-2 rounded w-full"
+                    />
+                  </div>
+                ) : null}
+              </li>
               ))}
             </ul>
           </>

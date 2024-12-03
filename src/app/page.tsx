@@ -39,25 +39,59 @@ export default function HomePage() {
   };
 
   return (
-    <div className="ml-48 p-6">
-      <h1>Create a New Flow</h1>
-      <form onSubmit={handleCreateFlow}>
-        <input
-          type="text"
-          placeholder="Enter flow name"
-          value={flowName}
-          onChange={(e) => setFlowName(e.target.value)}
-        />
-        <textarea
-          placeholder="Enter a short description"
-          value={flowDescription}
-          onChange={(e) => setFlowDescription(e.target.value)}
-          className="mt-4"
-        />
-        <button type="submit" className="mt-4">
-          Create Flow
+    <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 space-y-8">
+      {/* Create Flow Card */}
+      <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-md">
+        <h1 className="text-2xl font-bold mb-6 text-center">Create a New Flow</h1>
+        <form onSubmit={handleCreateFlow}>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Flow Name
+            </label>
+            <input
+              type="text"
+              placeholder="Enter flow name"
+              value={flowName}
+              onChange={(e) => setFlowName(e.target.value)}
+              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Flow Description
+            </label>
+            <textarea
+              placeholder="Enter a short description"
+              value={flowDescription}
+              onChange={(e) => setFlowDescription(e.target.value)}
+              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition duration-200"
+          >
+            Create Flow
+          </button>
+        </form>
+      </div>
+
+      {/* Load Flow Card */}
+      <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-md">
+        <h1 className="text-2xl font-bold mb-6 text-center">Load Existing Flow</h1>
+        <p className="text-gray-600 text-center mb-4">
+          This feature will allow you to load a saved flow.
+        </p>
+        <button
+          type="button"
+          className="w-full bg-gray-300 text-gray-700 py-2 rounded-md cursor-not-allowed"
+        >
+          Coming Soon
         </button>
-      </form>
+      </div>
     </div>
   );
 }
+
+
+
