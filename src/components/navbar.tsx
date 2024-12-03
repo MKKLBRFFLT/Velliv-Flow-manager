@@ -48,17 +48,17 @@ export default function LeftNavBar({
           <button onClick={() => onQuestionTypeChange('multiple-choice')}>
             Multiple Choice Question
           </button>
+          <button onClick={() => onQuestionTypeChange('checkbox')}>
+            Checkbox Question
+          </button>
+          <button onClick={() => onQuestionTypeChange('calendar')}>
+            Calendar Question
+          </button>
+          <button onClick={() => onQuestionTypeChange('dropdown')}>
+            Dropdown Question
+          </button>
         </div>
       )}
-      <Link href="/">Home</Link>
-      <div className="flex flex-col text-xl space-y-4 text-white">
-  <button onClick={() => onQuestionTypeChange('number')}>Numeric Question</button>
-  <button onClick={() => onQuestionTypeChange('text')}>Text Question</button>
-  <button onClick={() => onQuestionTypeChange('multiple-choice')}>Multiple Choice Question</button>
-  <button onClick={() => onQuestionTypeChange('checkbox')}>Checkbox Question</button>
-  <button onClick={() => onQuestionTypeChange('calendar')}>Calendar Question</button>
-  <button onClick={() => onQuestionTypeChange('dropdown')}>Dropdown Question</button>
-      </div>
     </nav>
   );
 }
