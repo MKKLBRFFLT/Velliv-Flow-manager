@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React from 'react';
-import ReactFlow, { Controls, Background, Node, Edge } from 'reactflow';
-import 'reactflow/dist/style.css';
+import React from "react";
+import ReactFlow, { Controls, Background, Node, Edge } from "reactflow";
+import "reactflow/dist/style.css";
 
 type FlowVisualizationProps = {
   flow: {
@@ -23,19 +23,26 @@ export default function FlowVisualization({ flow }: FlowVisualizationProps) {
   // Create nodes for pages and questions
   const nodes: Node[] = flow.pages.map((page, pageIndex) => ({
     id: `page-${page.id}`,
-    type: 'default',
+    type: "default",
     position: { x: pageIndex * 300, y: 50 },
     data: {
       label: (
-        <div>
+        <div style={{ color: "#FFFFFF" }}>
           <h3>{page.name}</h3>
           <ul>
             {page.questions.map((q, qIndex) => (
-              <li key={`q-${qIndex}`}>{q.text} ({q.inputType})</li>
+              <li key={`q-${qIndex}`}>
+                {q.text} ({q.inputType})
+              </li>
             ))}
           </ul>
         </div>
       ),
+    },
+    style: {
+      backgroundColor: "#006E64",
+      border: "1px solid #000",
+      borderRadius: 5,
     },
   }));
 
@@ -45,11 +52,16 @@ export default function FlowVisualization({ flow }: FlowVisualizationProps) {
     source: `page-${flow.pages[pageIndex].id}`,
     target: `page-${flow.pages[pageIndex + 1].id}`,
     animated: true,
+    style: { stroke: "#FFA032" },
   }));
 
   return (
-    <div style={{ width: '100%', height: '400px', border: '1px solid #ccc' }}>
-      <ReactFlow nodes={nodes} edges={edges}>
+    <div style={{ width: "100%", height: "400px", border: "1px solid #ccc" }}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        style={{ backgroundColor: "#ffffff" }}
+      >
         <Controls />
         <Background />
       </ReactFlow>
