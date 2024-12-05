@@ -9,6 +9,8 @@ import MultipleChoiceQuestion from "../../../components/MultipleChoiceQuestion";
 import CheckboxQuestion from "../../../components/CheckboxQuestion";
 import CalendarQuestion from "../../../components/CalendarQuestion";
 import DropdownQuestion from "../../../components/DropdownQuestion";
+import FlowVisualization from '../../../components/FlowVisualization';
+
 
 type Question = {
   text: string;
@@ -39,6 +41,7 @@ type Flow = {
 export default function FlowEditor() {
   const params = useParams();
   const [flow, setFlow] = useState<Flow | null>(null);
+  const [isVisualizationMode, setIsVisualizationMode] = useState(false);
   const [questionType, setQuestionType] = useState<
   'number' | 'text' | 'multiple-choice' | 'checkbox' | 'calendar' | 'dropdown'
 >('number');
@@ -130,9 +133,23 @@ export default function FlowEditor() {
       <LeftNavBar onQuestionTypeChange={setQuestionType} flowName={flow.name} />
       <div className="ml-48 p-6 w-full">
         <h1 className="text-2xl font-bold mb-4">
-          {isPreview ? `Preview: ${flow.name}` : `Editing Flow: ${flow.name}`}
+          {isVisualizationMode
+            ? `Flow Visualization: ${flow.name}`
+            : isPreview
+            ? `Preview: ${flow.name}`
+            : `Editing Flow: ${flow.name}`}
         </h1>
         <p className="text-gray-600 mb-6">{flow.description}</p>
+
+        <button
+          type="button"
+          onClick={() => setIsVisualizationMode(!isVisualizationMode)}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          {isVisualizationMode ? 'Switch to Edit Mode' : 'Switch to Visualization Mode'}
+        </button>
+
+        {isVisualizationMode && <FlowVisualization flow={flow} />}
 
         {/* Page Navigation */}
         <div className="flex space-x-2 mb-4">
