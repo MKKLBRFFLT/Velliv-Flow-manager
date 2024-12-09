@@ -111,6 +111,10 @@ export default function FlowEditor() {
     };
 
     const flows = JSON.parse(localStorage.getItem("flows") || "[]") as Flow[];
+    if (!Array.isArray(flows)) {
+      return;
+    }
+
     const updatedFlows = flows.map((f) => (f.id === flow.id ? updatedFlow : f));
     localStorage.setItem("flows", JSON.stringify(updatedFlows));
 
@@ -122,7 +126,7 @@ export default function FlowEditor() {
     }
     setCurrentPageIndex(newIndex);
 
-    if (updatedPages.length === 0) {
+    if (updatedPages.length <= 1) {
       handleAddPage();
     }
   };
