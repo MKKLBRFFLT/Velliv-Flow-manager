@@ -10,6 +10,7 @@ import CheckboxQuestion from "../../../components/CheckboxQuestion";
 import CalendarQuestion from "../../../components/CalendarQuestion";
 import DropdownQuestion from "../../../components/DropdownQuestion";
 import FlowVisualization from "../../../components/FlowVisualization";
+import { updateFlow } from "@/utils/flowStorage";
 
 type Question = {
   text: string;
@@ -74,6 +75,16 @@ export default function FlowEditor() {
     setFlow(currentFlow);
   }, [params.flow]);
 
+  useEffect(() => {
+    if (flow) {
+      const timeoutId = setTimeout(() => {
+        updateFlow(flow);
+      }, 1000);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [flow]);
+
   const handleAddPage = () => {
     if (!flow) return;
 
@@ -110,13 +121,7 @@ export default function FlowEditor() {
       pages: updatedPages,
     };
 
-    const flows = JSON.parse(localStorage.getItem("flows") || "[]") as Flow[];
-    if (!Array.isArray(flows)) {
-      return;
-    }
-
-    const updatedFlows = flows.map((f) => (f.id === flow.id ? updatedFlow : f));
-    localStorage.setItem("flows", JSON.stringify(updatedFlows));
+    updateFlow(updatedFlow);
 
     setFlow(updatedFlow);
 
@@ -126,7 +131,7 @@ export default function FlowEditor() {
     }
     setCurrentPageIndex(newIndex);
 
-    if (updatedPages.length <= 1) {
+    if (updatedPages.length < 1) {
       handleAddPage();
     }
   };

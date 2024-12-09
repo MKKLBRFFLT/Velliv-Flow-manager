@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { addFlow } from "@/utils/flowStorage";
 
 export default function HomePage() {
   const [flowName, setFlowName] = useState<string>("");
@@ -22,14 +23,7 @@ export default function HomePage() {
     };
 
     // Save the flow in local storage
-    const flows = JSON.parse(localStorage.getItem("flows") || "[]") as Array<{
-      id: string;
-      name: string;
-      description: string;
-      questions: any[];
-    }>;
-    flows.push(newFlow);
-    localStorage.setItem("flows", JSON.stringify(flows));
+    addFlow(newFlow);
 
     // Log the flow details
     console.log(JSON.stringify(newFlow, null, 2));
