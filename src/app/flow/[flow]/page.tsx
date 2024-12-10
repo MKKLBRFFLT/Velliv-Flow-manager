@@ -101,9 +101,7 @@ export default function FlowEditor() {
     };
 
     // Update flows in local storage
-    const flows = JSON.parse(localStorage.getItem("flows") || "[]") as Flow[];
-    const updatedFlows = flows.map((f) => (f.id === flow.id ? updatedFlow : f));
-    localStorage.setItem("flows", JSON.stringify(updatedFlows));
+    updateFlow(updatedFlow);
 
     setFlow(updatedFlow);
     setCurrentPageIndex(updatedFlow.pages.length - 1);
@@ -154,9 +152,7 @@ export default function FlowEditor() {
       pages: updatedPages,
     };
 
-    const flows = JSON.parse(localStorage.getItem("flows") || "[]") as Flow[];
-    const updatedFlows = flows.map((f) => (f.id === flow.id ? updatedFlow : f));
-    localStorage.setItem("flows", JSON.stringify(updatedFlows));
+    updateFlow(updatedFlow);
 
     setFlow(updatedFlow);
   };
