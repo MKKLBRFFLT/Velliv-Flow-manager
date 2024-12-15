@@ -11,6 +11,7 @@ import CalendarQuestion from "../../../components/CalendarQuestion";
 import DropdownQuestion from "../../../components/DropdownQuestion";
 import FlowVisualization from "../../../components/FlowVisualization";
 import { updateFlow } from "@/utils/flowStorage";
+import ConditionsEditor from "../../../components/ConditionsEditor";
 
 type Question = {
   text: string;
@@ -31,10 +32,25 @@ type Question = {
   options?: string[];
 };
 
+type PreCondition = {
+  questionIndex: number; // Index of the question to evaluate
+  expectedValue: string | number | string[]; // Value to match
+};
+
+type PostCondition = {
+  condition: {
+    questionIndex: number; // Index of the question to evaluate
+    value: string | number | string[]; // Value to match
+  };
+  nextPageId: string; // ID of the next page if condition is met
+};
+
 type Page = {
   id: string;
   name: string;
   questions: Question[];
+  preConditions?: PreCondition[]; // Optional pre-conditions
+  postConditions?: PostCondition[]; // Optional post-conditions
 };
 
 type Flow = {
@@ -155,6 +171,47 @@ export default function FlowEditor() {
     updateFlow(updatedFlow);
 
     setFlow(updatedFlow);
+  };
+
+  const handleNextPage = () => {
+    if (!flow) return;
+  
+    const currentPage = flow.pages[currentPageIndex];
+  
+    // Default fallback to linear navigation
+    let nextPageIndex = currentPageIndex + 1;
+  
+    // Check for post-conditions
+    if (currentPage.postConditions?.length) {
+      // Evaluate each condition to find a match
+      const matchedCondition = currentPage.postConditions.find((condition) => {
+        const questionIndex = condition.condition.questionIndex;
+        const userAnswer = previewAnswers[questionIndex]; // Get the user's answer
+        return userAnswer === condition.condition.value; // Check if the condition matches
+      });
+  
+      // If a condition matches, navigate to the specified page
+      if (matchedCondition) {
+        const targetPageIndex = flow.pages.findIndex(
+          (page) => page.id === matchedCondition.nextPageId
+        );
+        if (targetPageIndex !== -1) {
+          nextPageIndex = targetPageIndex; // Update to matched page
+        }
+      }
+    }
+  
+    // Update the page index if it's valid
+    if (nextPageIndex < flow.pages.length) {
+      setCurrentPageIndex(nextPageIndex);
+    }
+  };
+  
+
+  const handlePreviousPage = () => {
+    if (currentPageIndex > 0) {
+      setCurrentPageIndex(currentPageIndex - 1);
+    }
   };
 
   const handleAnswerChange = (
@@ -363,6 +420,63 @@ export default function FlowEditor() {
                 </li>
               ))}
             </ul>
+              {/* Add the ConditionsEditor here */}
+              <ConditionsEditor
+                page={flow.pages[currentPageIndex]}
+                allPages={flow.pages}
+                onAddPreCondition={(preCondition) => {
+                  const updatedPages = flow.pages.map((page, index) =>
+                    index === currentPageIndex
+                      ? {
+                          ...page,
+                          preConditions: [...(page.preConditions || []), preCondition],
+                        }
+                      : page
+                  );
+                  const updatedFlow = { ...flow, pages: updatedPages };
+                  updateFlow(updatedFlow);
+                  setFlow(updatedFlow);
+                }}
+                onDeletePreCondition={(index) => {
+                  const updatedPages = flow.pages.map((page, pageIndex) =>
+                    pageIndex === currentPageIndex
+                      ? {
+                          ...page,
+                          preConditions: page.preConditions?.filter((_, i) => i !== index),
+                        }
+                      : page
+                  );
+                  const updatedFlow = { ...flow, pages: updatedPages };
+                  updateFlow(updatedFlow);
+                  setFlow(updatedFlow);
+                }}
+                onAddPostCondition={(postCondition) => {
+                  const updatedPages = flow.pages.map((page, index) =>
+                    index === currentPageIndex
+                      ? {
+                          ...page,
+                          postConditions: [...(page.postConditions || []), postCondition],
+                        }
+                      : page
+                  );
+                  const updatedFlow = { ...flow, pages: updatedPages };
+                  updateFlow(updatedFlow);
+                  setFlow(updatedFlow);
+                }}
+                onDeletePostCondition={(index) => {
+                  const updatedPages = flow.pages.map((page, pageIndex) =>
+                    pageIndex === currentPageIndex
+                      ? {
+                          ...page,
+                          postConditions: page.postConditions?.filter((_, i) => i !== index),
+                        }
+                      : page
+                  );
+                  const updatedFlow = { ...flow, pages: updatedPages };
+                  updateFlow(updatedFlow);
+                  setFlow(updatedFlow);
+                }}
+              />
           </>
         ) : (
           <>
@@ -506,6 +620,86 @@ export default function FlowEditor() {
         >
           {isPreview ? "Exit Preview Mode" : "Enter Preview Mode"}
         </button>
+
+        {isPreview ? (
+          <div>
+{/*             <h2 className="text-xl font-semibold mb-4">
+              {flow.pages[currentPageIndex]?.name}
+            </h2>
+            <ul className="space-y-4">
+              {flow.pages[currentPageIndex]?.questions.map((q, index) => (
+                <li
+                  key={index}
+                  className="border p-4 rounded shadow-sm bg-gray-50"
+                >
+                  <p className="font-medium">{q.text}</p>
+                  {q.inputType === "number" ? (
+                    <input
+                      type="number"
+                      onChange={(e) =>
+                        handleAnswerChange(index, Number(e.target.value))
+                      }
+                      className="border p-2 rounded w-full"
+                    />
+                  ) : q.inputType === "text" ? (
+                    <input
+                      type="text"
+                      onChange={(e) =>
+                        handleAnswerChange(index, e.target.value)
+                      }
+                      className="border p-2 rounded w-full"
+                    />
+                  ) : q.inputType === "multiple-choice" ? (
+                    <div className="mt-2">
+                      {q.answers?.map((answer, answerIndex) => (
+                        <button
+                          key={answerIndex}
+                          onClick={() =>
+                            handleAnswerChange(index, answer)
+                          }
+                          className={`border p-2 rounded w-full text-left ${
+                            previewAnswers[index] === answer
+                              ? "bg-blue-100"
+                              : ""
+                          }`}
+                        >
+                          {answer}
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+                </li>
+              ))}
+            </ul> */}
+
+            {/* Navigation Buttons */}
+            <div className="flex justify-between mt-6">
+              <button
+                onClick={handlePreviousPage}
+                disabled={currentPageIndex === 0}
+                className={`bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 ${
+                  currentPageIndex === 0 && "cursor-not-allowed opacity-50"
+                }`}
+              >
+                Previous
+              </button>
+              <button
+                onClick={handleNextPage}
+                disabled={currentPageIndex === flow.pages.length - 1}
+                className={`bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 ${
+                  currentPageIndex === flow.pages.length - 1 &&
+                  "cursor-not-allowed opacity-50"
+                }`}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div>
+            {/* Editing functionality remains here */}
+          </div>
+        )}
       </div>
     </div>
   );

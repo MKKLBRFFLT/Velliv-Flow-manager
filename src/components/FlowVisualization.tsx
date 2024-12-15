@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ReactFlow, {
   Controls,
   Background,
@@ -8,26 +8,38 @@ import ReactFlow, {
   Edge,
   useNodesState,
   useEdgesState,
-  Connection,
-  addEdge,
+  MarkerType,
 } from "reactflow";
 import "reactflow/dist/style.css";
 
+type Question = {
+  text: string;
+  inputType: string;
+};
+
+type PreCondition = {
+  questionIndex: number;
+  expectedValue: string | number | string[];
+};
+
+type Page = {
+  id: string;
+  name: string;
+  questions: Question[];
+  preConditions?: PreCondition[];
+  postConditions?: Array<{
+    condition: { questionIndex: number; value: string | number | string[] };
+    nextPageId: string;
+  }>;
+};
+
 type FlowVisualizationProps = {
   flow: {
-    pages: Array<{
-      id: string;
-      name: string;
-      questions: Array<{
-        text: string;
-        inputType: string;
-      }>;
-    }>;
+    pages: Page[];
   };
 };
 
 const LOCAL_STORAGE_KEY_NODES = "flow-visualization-nodes";
-const LOCAL_STORAGE_KEY_EDGES = "flow-visualization-edges";
 
 export default function FlowVisualization({ flow }: FlowVisualizationProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -36,17 +48,23 @@ export default function FlowVisualization({ flow }: FlowVisualizationProps) {
   useEffect(() => {
     if (!flow?.pages) return;
 
-    // Load saved positions and edges from local storage
+    // Load saved positions from local storage
     const savedNodes = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_NODES) || "[]");
-    const savedEdges = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_EDGES) || "[]");
 
-    // Create nodes with saved positions or default ones
+    // Create nodes with saved positions or calculate relative positions
     const initialNodes: Node[] = flow.pages.map((page, pageIndex) => {
       const savedNode = savedNodes.find((node: Node) => node.id === `page-${page.id}`);
+      const lastNodePosition =
+        savedNodes[savedNodes.length - 1]?.position || { x: (pageIndex - 1) * 300, y: 50 };
+
       return {
         id: `page-${page.id}`,
         type: "default",
-        position: savedNode?.position || { x: pageIndex * 300, y: 50 },
+        position:
+          savedNode?.position ||
+          (pageIndex === flow.pages.length - 1 // Newest node closer to the last
+            ? { x: lastNodePosition.x + 200, y: lastNodePosition.y + 100 }
+            : { x: pageIndex * 300, y: 50 }),
         data: {
           label: (
             <div style={{ color: "#FFFFFF" }}>
@@ -69,16 +87,63 @@ export default function FlowVisualization({ flow }: FlowVisualizationProps) {
       };
     });
 
-    // Load or initialize edges
-    const initialEdges: Edge[] = savedEdges.length
-      ? savedEdges
-      : [];
+    // Create edges for post-conditions
+    const postConditionEdges: Edge[] = flow.pages.flatMap((page) =>
+      page.postConditions?.map((condition, index) => {
+        const targetPage = flow.pages.find((p) => p.id === condition.nextPageId);
+        if (targetPage) {
+          return {
+            id: `post-edge-${page.id}-${index}`,
+            source: `page-${page.id}`,
+            target: `page-${targetPage.id}`,
+            label: `If "${condition.condition.value}"`,
+            labelStyle: { fill: "#FFA032", fontWeight: "bold" },
+            animated: true,
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              color: "#FFA032",
+            },
+            style: { stroke: "#FFA032", strokeWidth: 2 },
+          };
+        }
+        return null;
+      }) || []
+    ).filter((edge) => edge !== null);
+
+    // Create edges for pre-conditions
+    const preConditionEdges: Edge[] = flow.pages.flatMap((page, pageIndex) =>
+      page.preConditions?.map((condition, index) => {
+        // Identify the source page based on the question index
+        const sourcePage = flow.pages.find(
+          (p) => p.questions.length > condition.questionIndex && flow.pages.indexOf(p) < pageIndex
+        );
+        if (sourcePage) {
+          return {
+            id: `pre-edge-${page.id}-${index}`,
+            source: `page-${sourcePage.id}`,
+            target: `page-${page.id}`,
+            label: `Depends on "${condition.expectedValue}"`,
+            labelStyle: { fill: "#4CAF50", fontWeight: "bold" },
+            animated: true,
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              color: "#4CAF50",
+            },
+            style: { stroke: "#4CAF50", strokeWidth: 2, strokeDasharray: "5 5" }, // Dashed line for pre-conditions
+          };
+        }
+        return null;
+      }) || []
+    ).filter((edge) => edge !== null);
+
+    // Combine pre-condition and post-condition edges
+    const initialEdges = [...postConditionEdges, ...preConditionEdges];
 
     setNodes(initialNodes);
-    setEdges(initialEdges);
+    setEdges(initialEdges as Edge[]);
   }, [flow]);
 
-  // Save node positions and edges on changes
+  // Save node positions on change
   const handleNodesChange = (changes: any) => {
     onNodesChange(changes);
 
@@ -89,27 +154,14 @@ export default function FlowVisualization({ flow }: FlowVisualizationProps) {
     localStorage.setItem(LOCAL_STORAGE_KEY_NODES, JSON.stringify(updatedNodes));
   };
 
-  const handleEdgesChange = (changes: any) => {
-    onEdgesChange(changes);
-    localStorage.setItem(LOCAL_STORAGE_KEY_EDGES, JSON.stringify(edges));
-  };
-
-  const handleConnect = (connection: Connection) => {
-    const updatedEdges = addEdge(connection, edges);
-    setEdges(updatedEdges);
-    localStorage.setItem(LOCAL_STORAGE_KEY_EDGES, JSON.stringify(updatedEdges));
-  };
-
   return (
     <div style={{ width: "100%", height: "600px", border: "1px solid #ccc" }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
         onNodesChange={handleNodesChange}
-        onEdgesChange={handleEdgesChange}
-        onConnect={handleConnect}
+        onEdgesChange={onEdgesChange}
         style={{ backgroundColor: "#ffffff" }}
-        connectionLineStyle={{ stroke: "#FFA032", strokeWidth: 2 }}
       >
         <Controls />
         <Background />
@@ -117,6 +169,10 @@ export default function FlowVisualization({ flow }: FlowVisualizationProps) {
     </div>
   );
 }
+
+
+
+
 
 
 

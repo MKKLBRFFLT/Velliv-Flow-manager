@@ -75,10 +75,10 @@ export default function HomePage() {
       {/* Load Flow Card */}
       <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-md">
         <h1 className="text-2xl font-bold mb-6 text-center">
-          Load Existing Flow
+          Manage Existing Flows
         </h1>
         <p className="text-gray-600 text-center mb-4">
-          This feature will allow you to load a saved flow.
+          This feature will allow you to view and manage existing flows.
         </p>
         <button
           type="button"
