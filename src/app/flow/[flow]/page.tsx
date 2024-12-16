@@ -178,34 +178,49 @@ export default function FlowEditor() {
   
     const currentPage = flow.pages[currentPageIndex];
   
-    // Default fallback to linear navigation
-    let nextPageIndex = currentPageIndex + 1;
+    let nextPageIndex = currentPageIndex + 1; // Default to sequential navigation
   
-    // Check for post-conditions
+    // Evaluate post-conditions on the current page
     if (currentPage.postConditions?.length) {
-      // Evaluate each condition to find a match
-      const matchedCondition = currentPage.postConditions.find((condition) => {
-        const questionIndex = condition.condition.questionIndex;
-        const userAnswer = previewAnswers[questionIndex]; // Get the user's answer
-        return userAnswer === condition.condition.value; // Check if the condition matches
+      const matchedPostCondition = currentPage.postConditions.find((condition) => {
+        const userAnswer = previewAnswers[condition.condition.questionIndex]; // User's input
+        return userAnswer === condition.condition.value; // Match post-condition
       });
   
-      // If a condition matches, navigate to the specified page
-      if (matchedCondition) {
+      if (matchedPostCondition) {
         const targetPageIndex = flow.pages.findIndex(
-          (page) => page.id === matchedCondition.nextPageId
+          (page) => page.id === matchedPostCondition.nextPageId
         );
         if (targetPageIndex !== -1) {
-          nextPageIndex = targetPageIndex; // Update to matched page
+          nextPageIndex = targetPageIndex;
+          setCurrentPageIndex(nextPageIndex);
+          return; // Exit early if post-condition is matched
         }
       }
     }
   
-    // Update the page index if it's valid
+    // Evaluate pre-conditions for subsequent pages
+    const nextPageWithPreCondition = flow.pages.findIndex((page, pageIndex) => {
+      if (pageIndex <= currentPageIndex) return false; // Skip current and previous pages
+  
+      return (
+        page.preConditions?.every((condition) => {
+          const userAnswer = previewAnswers[condition.questionIndex]; // User's input
+          return userAnswer === condition.expectedValue; // Match pre-condition
+        }) ?? false
+      );
+    });
+  
+    if (nextPageWithPreCondition !== -1) {
+      nextPageIndex = nextPageWithPreCondition;
+    }
+  
+    // Update to the determined next page if valid
     if (nextPageIndex < flow.pages.length) {
       setCurrentPageIndex(nextPageIndex);
     }
   };
+  
   
 
   const handlePreviousPage = () => {
