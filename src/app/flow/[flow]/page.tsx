@@ -665,7 +665,6 @@ export default function FlowEditor() {
 
         {isPreview ? (
           <div>
-{/*             <h2 className="text-xl font-semibold mb-4">
             {/*             <h2 className="text-xl font-semibold mb-4">
               {flow.pages[currentPageIndex]?.name}
             </h2>
