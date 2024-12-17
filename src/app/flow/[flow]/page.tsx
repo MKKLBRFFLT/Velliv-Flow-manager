@@ -116,7 +116,7 @@ export default function FlowEditor() {
       pages: [...flow.pages, newPage],
     };
 
-    // Update flows in local storage
+        // Update flows in local storage
     updateFlow(updatedFlow);
     setFlow(updatedFlow);
     setCurrentPageIndex(updatedFlow.pages.length - 1);
@@ -666,6 +666,7 @@ export default function FlowEditor() {
         {isPreview ? (
           <div>
 {/*             <h2 className="text-xl font-semibold mb-4">
+            {/*             <h2 className="text-xl font-semibold mb-4">
               {flow.pages[currentPageIndex]?.name}
             </h2>
             <ul className="space-y-4">
