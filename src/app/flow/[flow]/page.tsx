@@ -118,7 +118,6 @@ export default function FlowEditor() {
 
     // Update flows in local storage
     updateFlow(updatedFlow);
-
     setFlow(updatedFlow);
     setCurrentPageIndex(updatedFlow.pages.length - 1);
   };
@@ -173,20 +172,43 @@ export default function FlowEditor() {
     setFlow(updatedFlow);
   };
 
+  // NEW FUNCTION: Delete a specific question from the current page
+  const handleDeleteQuestion = (questionIndex: number) => {
+    if (!flow) return;
+
+    const updatedPages = flow.pages.map((page, pIndex) => {
+      if (pIndex === currentPageIndex) {
+        return {
+          ...page,
+          questions: page.questions.filter((_, qIndex) => qIndex !== questionIndex),
+        };
+      }
+      return page;
+    });
+
+    const updatedFlow: Flow = {
+      ...flow,
+      pages: updatedPages,
+    };
+
+    updateFlow(updatedFlow);
+    setFlow(updatedFlow);
+  };
+
   const handleNextPage = () => {
     if (!flow) return;
-  
+
     const currentPage = flow.pages[currentPageIndex];
-  
+
     let nextPageIndex = currentPageIndex + 1; // Default to sequential navigation
-  
+
     // Evaluate post-conditions on the current page
     if (currentPage.postConditions?.length) {
       const matchedPostCondition = currentPage.postConditions.find((condition) => {
         const userAnswer = previewAnswers[condition.condition.questionIndex]; // User's input
         return userAnswer === condition.condition.value; // Match post-condition
       });
-  
+
       if (matchedPostCondition) {
         const targetPageIndex = flow.pages.findIndex(
           (page) => page.id === matchedPostCondition.nextPageId
@@ -198,11 +220,11 @@ export default function FlowEditor() {
         }
       }
     }
-  
+
     // Evaluate pre-conditions for subsequent pages
     const nextPageWithPreCondition = flow.pages.findIndex((page, pageIndex) => {
       if (pageIndex <= currentPageIndex) return false; // Skip current and previous pages
-  
+
       return (
         page.preConditions?.every((condition) => {
           const userAnswer = previewAnswers[condition.questionIndex]; // User's input
@@ -210,18 +232,16 @@ export default function FlowEditor() {
         }) ?? false
       );
     });
-  
+
     if (nextPageWithPreCondition !== -1) {
       nextPageIndex = nextPageWithPreCondition;
     }
-  
+
     // Update to the determined next page if valid
     if (nextPageIndex < flow.pages.length) {
       setCurrentPageIndex(nextPageIndex);
     }
   };
-  
-  
 
   const handlePreviousPage = () => {
     if (currentPageIndex > 0) {
@@ -432,66 +452,74 @@ export default function FlowEditor() {
                   {q.inputType === "calendar" && (
                     <p>This is a calendar question.</p>
                   )}
+
+                  {/* Delete Question Button */}
+                  <button
+                    onClick={() => handleDeleteQuestion(index)}
+                    className="bg-red-500 text-white px-2 py-1 rounded mt-2 hover:bg-red-600"
+                  >
+                    Delete
+                  </button>
                 </li>
               ))}
             </ul>
-              {/* Add the ConditionsEditor here */}
-              <ConditionsEditor
-                page={flow.pages[currentPageIndex]}
-                allPages={flow.pages}
-                onAddPreCondition={(preCondition) => {
-                  const updatedPages = flow.pages.map((page, index) =>
-                    index === currentPageIndex
-                      ? {
-                          ...page,
-                          preConditions: [...(page.preConditions || []), preCondition],
-                        }
-                      : page
-                  );
-                  const updatedFlow = { ...flow, pages: updatedPages };
-                  updateFlow(updatedFlow);
-                  setFlow(updatedFlow);
-                }}
-                onDeletePreCondition={(index) => {
-                  const updatedPages = flow.pages.map((page, pageIndex) =>
-                    pageIndex === currentPageIndex
-                      ? {
-                          ...page,
-                          preConditions: page.preConditions?.filter((_, i) => i !== index),
-                        }
-                      : page
-                  );
-                  const updatedFlow = { ...flow, pages: updatedPages };
-                  updateFlow(updatedFlow);
-                  setFlow(updatedFlow);
-                }}
-                onAddPostCondition={(postCondition) => {
-                  const updatedPages = flow.pages.map((page, index) =>
-                    index === currentPageIndex
-                      ? {
-                          ...page,
-                          postConditions: [...(page.postConditions || []), postCondition],
-                        }
-                      : page
-                  );
-                  const updatedFlow = { ...flow, pages: updatedPages };
-                  updateFlow(updatedFlow);
-                  setFlow(updatedFlow);
-                }}
-                onDeletePostCondition={(index) => {
-                  const updatedPages = flow.pages.map((page, pageIndex) =>
-                    pageIndex === currentPageIndex
-                      ? {
-                          ...page,
-                          postConditions: page.postConditions?.filter((_, i) => i !== index),
-                        }
-                      : page
-                  );
-                  const updatedFlow = { ...flow, pages: updatedPages };
-                  updateFlow(updatedFlow);
-                  setFlow(updatedFlow);
-                }}
-              />
+
+            <ConditionsEditor
+              page={flow.pages[currentPageIndex]}
+              allPages={flow.pages}
+              onAddPreCondition={(preCondition) => {
+                const updatedPages = flow.pages.map((page, index) =>
+                  index === currentPageIndex
+                    ? {
+                        ...page,
+                        preConditions: [...(page.preConditions || []), preCondition],
+                      }
+                    : page
+                );
+                const updatedFlow = { ...flow, pages: updatedPages };
+                updateFlow(updatedFlow);
+                setFlow(updatedFlow);
+              }}
+              onDeletePreCondition={(index) => {
+                const updatedPages = flow.pages.map((page, pageIndex) =>
+                  pageIndex === currentPageIndex
+                    ? {
+                        ...page,
+                        preConditions: page.preConditions?.filter((_, i) => i !== index),
+                      }
+                    : page
+                );
+                const updatedFlow = { ...flow, pages: updatedPages };
+                updateFlow(updatedFlow);
+                setFlow(updatedFlow);
+              }}
+              onAddPostCondition={(postCondition) => {
+                const updatedPages = flow.pages.map((page, index) =>
+                  index === currentPageIndex
+                    ? {
+                        ...page,
+                        postConditions: [...(page.postConditions || []), postCondition],
+                      }
+                    : page
+                );
+                const updatedFlow = { ...flow, pages: updatedPages };
+                updateFlow(updatedFlow);
+                setFlow(updatedFlow);
+              }}
+              onDeletePostCondition={(index) => {
+                const updatedPages = flow.pages.map((page, pageIndex) =>
+                  pageIndex === currentPageIndex
+                    ? {
+                        ...page,
+                        postConditions: page.postConditions?.filter((_, i) => i !== index),
+                      }
+                    : page
+                );
+                const updatedFlow = { ...flow, pages: updatedPages };
+                updateFlow(updatedFlow);
+                setFlow(updatedFlow);
+              }}
+            />
           </>
         ) : (
           <>
@@ -516,7 +544,6 @@ export default function FlowEditor() {
                         }
                         className="border p-2 rounded w-full"
                       />
-                      {/* validation message */}
                     </div>
                   ) : q.inputType === "text" ? (
                     // handling for text input
