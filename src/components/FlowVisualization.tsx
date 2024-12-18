@@ -37,11 +37,12 @@ type FlowVisualizationProps = {
   flow: {
     pages: Page[];
   };
+  onSwitchPage: (pageIndex: number) => void; // Callback to switch pages in the editor
 };
 
 const LOCAL_STORAGE_KEY_NODES = "flow-visualization-nodes";
 
-export default function FlowVisualization({ flow }: FlowVisualizationProps) {
+export default function FlowVisualization({ flow, onSwitchPage }: FlowVisualizationProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
@@ -49,7 +50,7 @@ export default function FlowVisualization({ flow }: FlowVisualizationProps) {
     if (!flow?.pages) return;
 
     // Load saved positions from local storage
-    const savedNodes = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_NODES) || "[]");
+    const savedNodes = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_NODES) || '[]');
 
     // Create nodes with saved positions or calculate relative positions
     const initialNodes: Node[] = flow.pages.map((page, pageIndex) => {
@@ -59,15 +60,15 @@ export default function FlowVisualization({ flow }: FlowVisualizationProps) {
 
       return {
         id: `page-${page.id}`,
-        type: "default",
+        type: 'default',
         position:
           savedNode?.position ||
-          (pageIndex === flow.pages.length - 1 // Newest node closer to the last
+          (pageIndex === flow.pages.length - 1
             ? { x: lastNodePosition.x + 200, y: lastNodePosition.y + 100 }
             : { x: pageIndex * 300, y: 50 }),
         data: {
           label: (
-            <div style={{ color: "#FFFFFF" }}>
+            <div style={{ color: '#FFFFFF', cursor: 'pointer' }}>
               <h3>{page.name}</h3>
               <ul>
                 {page.questions.map((q, qIndex) => (
@@ -80,8 +81,8 @@ export default function FlowVisualization({ flow }: FlowVisualizationProps) {
           ),
         },
         style: {
-          backgroundColor: "#006E64",
-          border: "1px solid #000",
+          backgroundColor: '#006E64',
+          border: '1px solid #000',
           borderRadius: 5,
         },
       };
@@ -97,13 +98,13 @@ export default function FlowVisualization({ flow }: FlowVisualizationProps) {
             source: `page-${page.id}`,
             target: `page-${targetPage.id}`,
             label: `If "${condition.condition.value}"`,
-            labelStyle: { fill: "#FFA032", fontWeight: "bold" },
+            labelStyle: { fill: '#FFA032', fontWeight: 'bold' },
             animated: true,
             markerEnd: {
               type: MarkerType.ArrowClosed,
-              color: "#FFA032",
+              color: '#FFA032',
             },
-            style: { stroke: "#FFA032", strokeWidth: 2 },
+            style: { stroke: '#FFA032', strokeWidth: 2 },
           };
         }
         return null;
@@ -113,7 +114,6 @@ export default function FlowVisualization({ flow }: FlowVisualizationProps) {
     // Create edges for pre-conditions
     const preConditionEdges: Edge[] = flow.pages.flatMap((page, pageIndex) =>
       page.preConditions?.map((condition, index) => {
-        // Identify the source page based on the question index
         const sourcePage = flow.pages.find(
           (p) => p.questions.length > condition.questionIndex && flow.pages.indexOf(p) < pageIndex
         );
@@ -123,13 +123,13 @@ export default function FlowVisualization({ flow }: FlowVisualizationProps) {
             source: `page-${sourcePage.id}`,
             target: `page-${page.id}`,
             label: `Depends on "${condition.expectedValue}"`,
-            labelStyle: { fill: "#4CAF50", fontWeight: "bold" },
+            labelStyle: { fill: '#4CAF50', fontWeight: 'bold' },
             animated: true,
             markerEnd: {
               type: MarkerType.ArrowClosed,
-              color: "#4CAF50",
+              color: '#4CAF50',
             },
-            style: { stroke: "#4CAF50", strokeWidth: 2, strokeDasharray: "5 5" }, // Dashed line for pre-conditions
+            style: { stroke: '#4CAF50', strokeWidth: 2, strokeDasharray: '5 5' },
           };
         }
         return null;
@@ -154,14 +154,23 @@ export default function FlowVisualization({ flow }: FlowVisualizationProps) {
     localStorage.setItem(LOCAL_STORAGE_KEY_NODES, JSON.stringify(updatedNodes));
   };
 
+  // Handle node click to switch pages
+  const handleNodeClick = (event: React.MouseEvent, node: Node) => {
+    const pageIndex = flow.pages.findIndex((page) => `page-${page.id}` === node.id);
+    if (pageIndex !== -1) {
+      onSwitchPage(pageIndex); // Trigger page switch in the editor
+    }
+  };
+
   return (
-    <div style={{ width: "100%", height: "600px", border: "1px solid #ccc" }}>
+    <div style={{ width: '100%', height: '600px', border: '1px solid #ccc' }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
         onNodesChange={handleNodesChange}
         onEdgesChange={onEdgesChange}
-        style={{ backgroundColor: "#ffffff" }}
+        onNodeClick={handleNodeClick} // Attach node click handler
+        style={{ backgroundColor: '#ffffff' }}
       >
         <Controls />
         <Background />
@@ -169,6 +178,7 @@ export default function FlowVisualization({ flow }: FlowVisualizationProps) {
     </div>
   );
 }
+
 
 
 

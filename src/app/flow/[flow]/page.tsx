@@ -281,7 +281,10 @@ export default function FlowEditor() {
             : "Switch to Visualization Mode"}
         </button>
 
-        {isVisualizationMode && <FlowVisualization flow={flow} />}
+        {isVisualizationMode && <FlowVisualization 
+        flow={flow} 
+        onSwitchPage={(pageIndex) => setCurrentPageIndex(pageIndex)}
+        />}
 
         {/* Page Navigation */}
         <div className="flex space-x-2 mb-4">
