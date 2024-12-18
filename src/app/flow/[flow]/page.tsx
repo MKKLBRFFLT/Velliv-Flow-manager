@@ -22,10 +22,6 @@ type Question = {
     | "checkbox"
     | "calendar"
     | "dropdown";
-  min?: number;
-  max?: number;
-  lowOutcome?: string;
-  highOutcome?: string;
   placeholder?: string;
   answers?: string[];
   allowMultipleAnswers?: boolean;
@@ -387,17 +383,11 @@ export default function FlowEditor() {
                   <p className="font-medium">{q.text}</p>
                   <p>Type: {q.inputType}</p>
 
-                  {/* handling for number input */}
+                  {/* Handling for number input */}
                   {q.inputType === "number" && (
-                    <>
-                      <p>
-                        Min: {q.min ?? "None"}, Max: {q.max ?? "None"}
-                      </p>
-                      <p>
-                        Low Outcome: {q.lowOutcome ?? "None"}, High Outcome:{" "}
-                        {q.highOutcome ?? "None"}
-                      </p>
-                    </>
+                    <p>
+                      Question: {q.text}
+                    </p>
                   )}
 
                   {/* handling for text input */}
