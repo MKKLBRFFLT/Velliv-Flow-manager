@@ -12,6 +12,7 @@ import DropdownQuestion from "../../../components/DropdownQuestion";
 import FlowVisualization from "../../../components/FlowVisualization";
 import { updateFlow } from "@/utils/flowStorage";
 import ConditionsEditor from "../../../components/ConditionsEditor";
+import PlayMode from "@/components/PlayMode";
 
 type Question = {
   text: string;
@@ -60,6 +61,7 @@ export default function FlowEditor() {
   const params = useParams();
   const [flow, setFlow] = useState<Flow | null>(null);
   const [isVisualizationMode, setIsVisualizationMode] = useState(false);
+  const [isPlayMode, setIsPlayMode] = useState(false);
   const [questionType, setQuestionType] = useState<
     "number" | "text" | "multiple-choice" | "checkbox" | "calendar" | "dropdown"
   >("number");
@@ -260,7 +262,7 @@ export default function FlowEditor() {
 
   return (
     <div className="flex">
-      <LeftNavBar onQuestionTypeChange={setQuestionType} flowName={flow.name} />
+      <LeftNavBar onQuestionTypeChange={(type) => setQuestionType(type)}flowName={flow.name}isPlayMode={isPlayMode}/>
       <div className="ml-48 p-6 w-full">
         <h1 className="text-2xl font-bold mb-4">
           {isVisualizationMode
@@ -272,6 +274,16 @@ export default function FlowEditor() {
         <p className="text-gray-600 mb-6">{flow.description}</p>
 
         <button
+          onClick={() => setIsPlayMode((prev) => !prev)}
+          className={`px-4 py-2 rounded ${
+            isPlayMode ? 'bg-red-500 hover:bg-red-600' : 'bg-purple-500 hover:bg-purple-600'
+          } text-white`}
+        >
+          {isPlayMode ? 'Exit Play Mode' : 'Enter Play Mode'}
+        </button>
+
+
+      <button
           type="button"
           onClick={() => setIsVisualizationMode(!isVisualizationMode)}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
@@ -279,8 +291,9 @@ export default function FlowEditor() {
           {isVisualizationMode
             ? "Switch to Edit Mode"
             : "Switch to Visualization Mode"}
-        </button>
+      </button>
 
+        {isPlayMode && <PlayMode flow={flow} onExit={() => setIsPlayMode(false)} />}
         {isVisualizationMode && <FlowVisualization 
         flow={flow} 
         onSwitchPage={(pageIndex) => setCurrentPageIndex(pageIndex)}
