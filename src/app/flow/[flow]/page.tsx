@@ -262,416 +262,388 @@ export default function FlowEditor() {
 
   return (
     <div className="flex">
-      <LeftNavBar onQuestionTypeChange={(type) => setQuestionType(type)}flowName={flow.name}isPlayMode={isPlayMode}/>
-      <div className="ml-48 p-6 w-full">
-        <h1 className="text-2xl font-bold mb-4">
-          {isVisualizationMode
-            ? `Flow Visualization: ${flow.name}`
-            : isPreview
-            ? `Preview: ${flow.name}`
-            : `Editing Flow: ${flow.name}`}
-        </h1>
-        <p className="text-gray-600 mb-6">{flow.description}</p>
+      {!isPlayMode && (
+        <><LeftNavBar
+          onQuestionTypeChange={(type) => setQuestionType(type)}
+          flowName={flow.name} /><div className="ml-48 p-6 w-full">
+            <h1 className="text-2xl font-bold mb-4">
+              {isVisualizationMode
+                ? `Flow Visualization: ${flow.name}`
+                : isPreview
+                  ? `Preview: ${flow.name}`
+                  : `Editing Flow: ${flow.name}`}
+            </h1>
+            <p className="text-gray-600 mb-6">{flow.description}</p>
 
-        <button
-          onClick={() => setIsPlayMode((prev) => !prev)}
-          className={`px-4 py-2 rounded ${
-            isPlayMode ? 'bg-red-500 hover:bg-red-600' : 'bg-purple-500 hover:bg-purple-600'
-          } text-white`}
-        >
-          {isPlayMode ? 'Exit Play Mode' : 'Enter Play Mode'}
-        </button>
+            <button
+              onClick={() => setIsPlayMode((prev) => !prev)}
+              className={`px-4 py-2 rounded ${isPlayMode ? 'bg-red-500 hover:bg-red-600' : 'bg-purple-500 hover:bg-purple-600'} text-white`}
+            >
+              {isPlayMode ? 'Exit Play Mode' : 'Enter Play Mode'}
+            </button>
 
 
-      <button
-          type="button"
-          onClick={() => setIsVisualizationMode(!isVisualizationMode)}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
-          {isVisualizationMode
-            ? "Switch to Edit Mode"
-            : "Switch to Visualization Mode"}
-      </button>
+            <button
+              type="button"
+              onClick={() => setIsVisualizationMode(!isVisualizationMode)}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              {isVisualizationMode
+                ? "Switch to Edit Mode"
+                : "Switch to Visualization Mode"}
+            </button>
 
-        {isPlayMode && <PlayMode flow={flow} onExit={() => setIsPlayMode(false)} />}
-        {isVisualizationMode && <FlowVisualization 
-        flow={flow} 
-        onSwitchPage={(pageIndex) => setCurrentPageIndex(pageIndex)}
-        />}
+            {isPlayMode && <PlayMode flow={flow} onExit={() => setIsPlayMode(false)} />}
+            {isVisualizationMode && <FlowVisualization
+              flow={flow}
+              onSwitchPage={(pageIndex) => setCurrentPageIndex(pageIndex)} />}
 
-        {/* Page Navigation */}
-        <div className="flex space-x-2 mb-4">
-          <button
-            onClick={() => setCurrentPageIndex(0)}
-            disabled={currentPageIndex === 0}
-            className={`px-3 py-1 rounded ${
-              currentPageIndex === 0
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-gray-200 hover:bg-gray-300"
-            }`}
-          >
-            Første side
-          </button>
+            {/* Page Navigation */}
+            <div className="flex space-x-2 mb-4">
+              <button
+                onClick={() => setCurrentPageIndex(0)}
+                disabled={currentPageIndex === 0}
+                className={`px-3 py-1 rounded ${currentPageIndex === 0
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-gray-200 hover:bg-gray-300"}`}
+              >
+                Første side
+              </button>
 
-          <button
-            onClick={() => setCurrentPageIndex(currentPageIndex - 1)}
-            disabled={currentPageIndex === 0}
-            className={`px-3 py-1 rounded ${
-              currentPageIndex === 0
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-gray-200 hover:bg-gray-300"
-            }`}
-          >
-            Forrige side
-          </button>
+              <button
+                onClick={() => setCurrentPageIndex(currentPageIndex - 1)}
+                disabled={currentPageIndex === 0}
+                className={`px-3 py-1 rounded ${currentPageIndex === 0
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-gray-200 hover:bg-gray-300"}`}
+              >
+                Forrige side
+              </button>
 
-          <span className="px-3 py-1 rounded bg-blue-500 text-white">
-            Side {currentPageIndex + 1} of {flow.pages.length}
-          </span>
+              <span className="px-3 py-1 rounded bg-blue-500 text-white">
+                Side {currentPageIndex + 1} of {flow.pages.length}
+              </span>
 
-          <button
-            onClick={() => setCurrentPageIndex(currentPageIndex + 1)}
-            disabled={currentPageIndex === flow.pages.length - 1}
-            className={`px-3 py-1 rounded ${
-              currentPageIndex === flow.pages.length - 1
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-gray-200 hover:bg-gray-300"
-            }`}
-          >
-            Næste side
-          </button>
+              <button
+                onClick={() => setCurrentPageIndex(currentPageIndex + 1)}
+                disabled={currentPageIndex === flow.pages.length - 1}
+                className={`px-3 py-1 rounded ${currentPageIndex === flow.pages.length - 1
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-gray-200 hover:bg-gray-300"}`}
+              >
+                Næste side
+              </button>
 
-          <button
-            onClick={() => setCurrentPageIndex(flow.pages.length - 1)}
-            disabled={currentPageIndex === flow.pages.length - 1}
-            className={`px-3 py-1 rounded ${
-              currentPageIndex === flow.pages.length - 1
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-gray-200 hover:bg-gray-300"
-            }`}
-          >
-            Sidste side
-          </button>
+              <button
+                onClick={() => setCurrentPageIndex(flow.pages.length - 1)}
+                disabled={currentPageIndex === flow.pages.length - 1}
+                className={`px-3 py-1 rounded ${currentPageIndex === flow.pages.length - 1
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-gray-200 hover:bg-gray-300"}`}
+              >
+                Sidste side
+              </button>
 
-          <button
-            type="button"
-            onClick={handleAddPage}
-            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-          >
-            Tilføj ny side
-          </button>
-        </div>
+              <button
+                type="button"
+                onClick={handleAddPage}
+                className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+              >
+                Tilføj ny side
+              </button>
+            </div>
 
-        <div className="flex space-x-2 mb-4">
-          <button
-            type="button"
-            onClick={() => handleDeletePage()}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-          >
-            Slet side
-          </button>
-        </div>
+            <div className="flex space-x-2 mb-4">
+              <button
+                type="button"
+                onClick={() => handleDeletePage()}
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+              >
+                Slet side
+              </button>
+            </div>
 
-        {!isPreview ? (
-          <>
-            {questionType === "number" ? (
-              <NumericQuestion onAddQuestion={handleAddQuestion} />
-            ) : questionType === "text" ? (
-              <TextQuestion onAddQuestion={handleAddQuestion} />
-            ) : questionType === "multiple-choice" ? (
-              <MultipleChoiceQuestion onAddQuestion={handleAddQuestion} />
-            ) : questionType === "checkbox" ? (
-              <CheckboxQuestion onAddQuestion={handleAddQuestion} />
-            ) : questionType === "calendar" ? (
-              <CalendarQuestion onAddQuestion={handleAddQuestion} />
-            ) : questionType === "dropdown" ? (
-              <DropdownQuestion onAddQuestion={handleAddQuestion} />
-            ) : null}
-            <h2 className="text-xl font-semibold mt-6">
-              Spørgsmål på side {flow.pages[currentPageIndex]?.name}
-            </h2>
-            <ul className="space-y-4">
-              {flow.pages[currentPageIndex]?.questions.map((q, index) => (
-                <li
-                  key={index}
-                  className="border p-4 rounded shadow-sm bg-gray-50"
-                >
-                  <p className="font-medium">{q.text}</p>
-                  <p>Type: {q.inputType}</p>
+            {!isPreview ? (
+              <>
+                {questionType === "number" ? (
+                  <NumericQuestion onAddQuestion={handleAddQuestion} />
+                ) : questionType === "text" ? (
+                  <TextQuestion onAddQuestion={handleAddQuestion} />
+                ) : questionType === "multiple-choice" ? (
+                  <MultipleChoiceQuestion onAddQuestion={handleAddQuestion} />
+                ) : questionType === "checkbox" ? (
+                  <CheckboxQuestion onAddQuestion={handleAddQuestion} />
+                ) : questionType === "calendar" ? (
+                  <CalendarQuestion onAddQuestion={handleAddQuestion} />
+                ) : questionType === "dropdown" ? (
+                  <DropdownQuestion onAddQuestion={handleAddQuestion} />
+                ) : null}
+                <h2 className="text-xl font-semibold mt-6">
+                  Spørgsmål på side {flow.pages[currentPageIndex]?.name}
+                </h2>
+                <ul className="space-y-4">
+                  {flow.pages[currentPageIndex]?.questions.map((q, index) => (
+                    <li
+                      key={index}
+                      className="border p-4 rounded shadow-sm bg-gray-50"
+                    >
+                      <p className="font-medium">{q.text}</p>
+                      <p>Type: {q.inputType}</p>
 
-                  {/* Handling for number input */}
-                  {q.inputType === "number" && (
-                    <p>
-                      Question: {q.text}
-                    </p>
-                  )}
+                      {/* Handling for number input */}
+                      {q.inputType === "number" && (
+                        <p>
+                          Question: {q.text}
+                        </p>
+                      )}
 
-                  {/* handling for text input */}
-                  {q.inputType === "text" && (
-                    <p>Placeholder: {q.placeholder ?? "None"}</p>
-                  )}
+                      {/* handling for text input */}
+                      {q.inputType === "text" && (
+                        <p>Placeholder: {q.placeholder ?? "None"}</p>
+                      )}
 
-                  {/* handling for multiple-choice */}
-                  {q.inputType === "multiple-choice" && (
-                    <ul className="space-y-2">
-                      {q.answers?.map((answer, answerIndex) => (
-                        <li key={answerIndex} className="border p-2 rounded">
-                          {answer}
-                        </li>
-                      ))}
-                      <p>
-                        Allow Multiple Answers:{" "}
-                        {q.allowMultipleAnswers ? "Yes" : "No"}
-                      </p>
-                    </ul>
-                  )}
+                      {/* handling for multiple-choice */}
+                      {q.inputType === "multiple-choice" && (
+                        <ul className="space-y-2">
+                          {q.answers?.map((answer, answerIndex) => (
+                            <li key={answerIndex} className="border p-2 rounded">
+                              {answer}
+                            </li>
+                          ))}
+                          <p>
+                            Allow Multiple Answers:{" "}
+                            {q.allowMultipleAnswers ? "Yes" : "No"}
+                          </p>
+                        </ul>
+                      )}
 
-                  {/* handling for checkbox input */}
-                  {q.inputType === "checkbox" && (
-                    <>
-                      <p>Options:</p>
-                      <ul className="space-y-2">
-                        {q.options?.map((option, optionIndex) => (
-                          <li key={optionIndex} className="border p-2 rounded">
-                            {option}
-                          </li>
-                        ))}
-                      </ul>
-                    </>
-                  )}
+                      {/* handling for checkbox input */}
+                      {q.inputType === "checkbox" && (
+                        <>
+                          <p>Options:</p>
+                          <ul className="space-y-2">
+                            {q.options?.map((option, optionIndex) => (
+                              <li key={optionIndex} className="border p-2 rounded">
+                                {option}
+                              </li>
+                            ))}
+                          </ul>
+                        </>
+                      )}
 
-                  {/* handling for dropdown input */}
-                  {q.inputType === "dropdown" && (
-                    <>
-                      <p>Options:</p>
-                      <ul className="space-y-2">
-                        {q.options?.map((option, optionIndex) => (
-                          <li key={optionIndex} className="border p-2 rounded">
-                            {option}
-                          </li>
-                        ))}
-                      </ul>
-                    </>
-                  )}
+                      {/* handling for dropdown input */}
+                      {q.inputType === "dropdown" && (
+                        <>
+                          <p>Options:</p>
+                          <ul className="space-y-2">
+                            {q.options?.map((option, optionIndex) => (
+                              <li key={optionIndex} className="border p-2 rounded">
+                                {option}
+                              </li>
+                            ))}
+                          </ul>
+                        </>
+                      )}
 
-                  {/* handling for calendar input */}
-                  {q.inputType === "calendar" && (
-                    <p>This is a calendar question.</p>
-                  )}
+                      {/* handling for calendar input */}
+                      {q.inputType === "calendar" && (
+                        <p>This is a calendar question.</p>
+                      )}
 
-                  {/* Delete Question Button */}
-                  <button
-                    onClick={() => handleDeleteQuestion(index)}
-                    className="bg-red-500 text-white px-2 py-1 rounded mt-2 hover:bg-red-600"
-                  >
-                    Delete
-                  </button>
-                </li>
-              ))}
-            </ul>
+                      {/* Delete Question Button */}
+                      <button
+                        onClick={() => handleDeleteQuestion(index)}
+                        className="bg-red-500 text-white px-2 py-1 rounded mt-2 hover:bg-red-600"
+                      >
+                        Delete
+                      </button>
+                    </li>
+                  ))}
+                </ul>
 
-            <ConditionsEditor
-              page={flow.pages[currentPageIndex]}
-              allPages={flow.pages}
-              onAddPreCondition={(preCondition) => {
-                const updatedPages = flow.pages.map((page, index) =>
-                  index === currentPageIndex
-                    ? {
+                <ConditionsEditor
+                  page={flow.pages[currentPageIndex]}
+                  allPages={flow.pages}
+                  onAddPreCondition={(preCondition) => {
+                    const updatedPages = flow.pages.map((page, index) => index === currentPageIndex
+                      ? {
                         ...page,
                         preConditions: [...(page.preConditions || []), preCondition],
                       }
-                    : page
-                );
-                const updatedFlow = { ...flow, pages: updatedPages };
-                updateFlow(updatedFlow);
-                setFlow(updatedFlow);
-              }}
-              onDeletePreCondition={(index) => {
-                const updatedPages = flow.pages.map((page, pageIndex) =>
-                  pageIndex === currentPageIndex
-                    ? {
+                      : page
+                    );
+                    const updatedFlow = { ...flow, pages: updatedPages };
+                    updateFlow(updatedFlow);
+                    setFlow(updatedFlow);
+                  } }
+                  onDeletePreCondition={(index) => {
+                    const updatedPages = flow.pages.map((page, pageIndex) => pageIndex === currentPageIndex
+                      ? {
                         ...page,
                         preConditions: page.preConditions?.filter((_, i) => i !== index),
                       }
-                    : page
-                );
-                const updatedFlow = { ...flow, pages: updatedPages };
-                updateFlow(updatedFlow);
-                setFlow(updatedFlow);
-              }}
-              onAddPostCondition={(postCondition) => {
-                const updatedPages = flow.pages.map((page, index) =>
-                  index === currentPageIndex
-                    ? {
+                      : page
+                    );
+                    const updatedFlow = { ...flow, pages: updatedPages };
+                    updateFlow(updatedFlow);
+                    setFlow(updatedFlow);
+                  } }
+                  onAddPostCondition={(postCondition) => {
+                    const updatedPages = flow.pages.map((page, index) => index === currentPageIndex
+                      ? {
                         ...page,
                         postConditions: [...(page.postConditions || []), postCondition],
                       }
-                    : page
-                );
-                const updatedFlow = { ...flow, pages: updatedPages };
-                updateFlow(updatedFlow);
-                setFlow(updatedFlow);
-              }}
-              onDeletePostCondition={(index) => {
-                const updatedPages = flow.pages.map((page, pageIndex) =>
-                  pageIndex === currentPageIndex
-                    ? {
+                      : page
+                    );
+                    const updatedFlow = { ...flow, pages: updatedPages };
+                    updateFlow(updatedFlow);
+                    setFlow(updatedFlow);
+                  } }
+                  onDeletePostCondition={(index) => {
+                    const updatedPages = flow.pages.map((page, pageIndex) => pageIndex === currentPageIndex
+                      ? {
                         ...page,
                         postConditions: page.postConditions?.filter((_, i) => i !== index),
                       }
-                    : page
-                );
-                const updatedFlow = { ...flow, pages: updatedPages };
-                updateFlow(updatedFlow);
-                setFlow(updatedFlow);
-              }}
-            />
-          </>
-        ) : (
-          <>
-            <h2 className="text-xl font-semibold mb-4">
-              Spørgsmål {flow.pages[currentPageIndex]?.name}
-            </h2>
-            <ul className="space-y-4">
-              {flow.pages[currentPageIndex]?.questions.map((q, index) => (
-                <li
-                  key={index}
-                  className="border p-4 rounded shadow-sm bg-gray-50"
-                >
-                  <p className="font-medium">{q.text}</p>
+                      : page
+                    );
+                    const updatedFlow = { ...flow, pages: updatedPages };
+                    updateFlow(updatedFlow);
+                    setFlow(updatedFlow);
+                  } } />
+              </>
+            ) : (
+              <>
+                <h2 className="text-xl font-semibold mb-4">
+                  Spørgsmål {flow.pages[currentPageIndex]?.name}
+                </h2>
+                <ul className="space-y-4">
+                  {flow.pages[currentPageIndex]?.questions.map((q, index) => (
+                    <li
+                      key={index}
+                      className="border p-4 rounded shadow-sm bg-gray-50"
+                    >
+                      <p className="font-medium">{q.text}</p>
 
-                  {q.inputType === "number" ? (
-                    // handling for number input
-                    <div className="mt-2">
-                      <input
-                        type="number"
-                        onChange={(e) =>
-                          handleAnswerChange(index, Number(e.target.value))
-                        }
-                        className="border p-2 rounded w-full"
-                      />
-                    </div>
-                  ) : q.inputType === "text" ? (
-                    // handling for text input
-                    <input
-                      type="text"
-                      placeholder={q.placeholder ?? ""}
-                      onChange={(e) =>
-                        handleAnswerChange(index, e.target.value)
-                      }
-                      className="border p-2 rounded w-full"
-                    />
-                  ) : q.inputType === "multiple-choice" ? (
-                    // handling for multiple-choice
-                    <div className="mt-2">
-                      {q.answers?.map((answer, answerIndex) => (
-                        <button
-                          key={answerIndex}
-                          onClick={() => {
-                            if (q.allowMultipleAnswers) {
-                              const currentAnswers = Array.isArray(
-                                previewAnswers[index]
-                              )
-                                ? (previewAnswers[index] as string[])
-                                : [];
-                              const newAnswers = currentAnswers.includes(answer)
-                                ? currentAnswers.filter((a) => a !== answer)
-                                : [...currentAnswers, answer];
-                              handleAnswerChange(index, newAnswers);
-                            } else {
-                              handleAnswerChange(index, answer);
-                            }
-                          }}
-                          className={`border p-2 rounded w-full text-left ${
-                            (Array.isArray(previewAnswers[index]) &&
-                              previewAnswers[index].includes(answer)) ||
-                            previewAnswers[index] === answer
-                              ? "bg-blue-100"
-                              : ""
-                          }`}
-                        >
-                          {answer}
-                        </button>
-                      ))}
-                    </div>
-                  ) : q.inputType === "checkbox" ? (
-                    // handling for checkbox input
-                    <div className="mt-2">
-                      {q.options?.map((option, optionIndex) => (
-                        <label key={optionIndex} className="flex items-center">
+                      {q.inputType === "number" ? (
+                        // handling for number input
+                        <div className="mt-2">
                           <input
-                            type="checkbox"
-                            value={option}
-                            onChange={(e) => {
-                              const selectedOptions = Array.isArray(
-                                previewAnswers[index]
-                              )
-                                ? (previewAnswers[index] as string[])
-                                : [];
-                              if (e.target.checked) {
-                                handleAnswerChange(index, [
-                                  ...selectedOptions,
-                                  option,
-                                ]);
-                              } else {
-                                handleAnswerChange(
-                                  index,
-                                  selectedOptions.filter(
-                                    (opt) => opt !== option
+                            type="number"
+                            onChange={(e) => handleAnswerChange(index, Number(e.target.value))}
+                            className="border p-2 rounded w-full" />
+                        </div>
+                      ) : q.inputType === "text" ? (
+                        // handling for text input
+                        <input
+                          type="text"
+                          placeholder={q.placeholder ?? ""}
+                          onChange={(e) => handleAnswerChange(index, e.target.value)}
+                          className="border p-2 rounded w-full" />
+                      ) : q.inputType === "multiple-choice" ? (
+                        // handling for multiple-choice
+                        <div className="mt-2">
+                          {q.answers?.map((answer, answerIndex) => (
+                            <button
+                              key={answerIndex}
+                              onClick={() => {
+                                if (q.allowMultipleAnswers) {
+                                  const currentAnswers = Array.isArray(
+                                    previewAnswers[index]
                                   )
-                                );
-                              }
-                            }}
-                          />
-                          <span className="ml-2">{option}</span>
-                        </label>
-                      ))}
-                    </div>
-                  ) : q.inputType === "dropdown" ? (
-                    // handling for dropdown input
-                    <div className="mt-2">
-                      <select
-                        onChange={(e) =>
-                          handleAnswerChange(index, e.target.value)
-                        }
-                        className="border p-2 rounded w-full"
-                      >
-                        <option value="">Select an option</option>
-                        {q.options?.map((option, optionIndex) => (
-                          <option key={optionIndex} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  ) : q.inputType === "calendar" ? (
-                    // handling for calendar input
-                    <div className="mt-2">
-                      <input
-                        type="date"
-                        onChange={(e) =>
-                          handleAnswerChange(index, e.target.value)
-                        }
-                        className="border p-2 rounded w-full"
-                      />
-                    </div>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-        <button
-          type="button"
-          onClick={() => setIsPreview(!isPreview)}
-          className="bg-blue-500 text-white px-4 py-2 rounded mt-6 hover:bg-blue-600"
-        >
-          {isPreview ? "Exit Preview Mode" : "Enter Preview Mode"}
-        </button>
+                                    ? (previewAnswers[index] as string[])
+                                    : [];
+                                  const newAnswers = currentAnswers.includes(answer)
+                                    ? currentAnswers.filter((a) => a !== answer)
+                                    : [...currentAnswers, answer];
+                                  handleAnswerChange(index, newAnswers);
+                                } else {
+                                  handleAnswerChange(index, answer);
+                                }
+                              } }
+                              className={`border p-2 rounded w-full text-left ${(Array.isArray(previewAnswers[index]) &&
+                                  previewAnswers[index].includes(answer)) ||
+                                  previewAnswers[index] === answer
+                                  ? "bg-blue-100"
+                                  : ""}`}
+                            >
+                              {answer}
+                            </button>
+                          ))}
+                        </div>
+                      ) : q.inputType === "checkbox" ? (
+                        // handling for checkbox input
+                        <div className="mt-2">
+                          {q.options?.map((option, optionIndex) => (
+                            <label key={optionIndex} className="flex items-center">
+                              <input
+                                type="checkbox"
+                                value={option}
+                                onChange={(e) => {
+                                  const selectedOptions = Array.isArray(
+                                    previewAnswers[index]
+                                  )
+                                    ? (previewAnswers[index] as string[])
+                                    : [];
+                                  if (e.target.checked) {
+                                    handleAnswerChange(index, [
+                                      ...selectedOptions,
+                                      option,
+                                    ]);
+                                  } else {
+                                    handleAnswerChange(
+                                      index,
+                                      selectedOptions.filter(
+                                        (opt) => opt !== option
+                                      )
+                                    );
+                                  }
+                                } } />
+                              <span className="ml-2">{option}</span>
+                            </label>
+                          ))}
+                        </div>
+                      ) : q.inputType === "dropdown" ? (
+                        // handling for dropdown input
+                        <div className="mt-2">
+                          <select
+                            onChange={(e) => handleAnswerChange(index, e.target.value)}
+                            className="border p-2 rounded w-full"
+                          >
+                            <option value="">Select an option</option>
+                            {q.options?.map((option, optionIndex) => (
+                              <option key={optionIndex} value={option}>
+                                {option}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      ) : q.inputType === "calendar" ? (
+                        // handling for calendar input
+                        <div className="mt-2">
+                          <input
+                            type="date"
+                            onChange={(e) => handleAnswerChange(index, e.target.value)}
+                            className="border p-2 rounded w-full" />
+                        </div>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+            <button
+              type="button"
+              onClick={() => setIsPreview(!isPreview)}
+              className="bg-blue-500 text-white px-4 py-2 rounded mt-6 hover:bg-blue-600"
+            >
+              {isPreview ? "Exit Preview Mode" : "Enter Preview Mode"}
+            </button>
 
-        {isPreview ? (
-          <div>
-            {/*             <h2 className="text-xl font-semibold mb-4">
+            {isPreview ? (
+              <div>
+                {/*             <h2 className="text-xl font-semibold mb-4">
               {flow.pages[currentPageIndex]?.name}
             </h2>
             <ul className="space-y-4">
@@ -720,35 +692,43 @@ export default function FlowEditor() {
               ))}
             </ul> */}
 
-            {/* Navigation Buttons */}
-            <div className="flex justify-between mt-6">
-              <button
-                onClick={handlePreviousPage}
-                disabled={currentPageIndex === 0}
-                className={`bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 ${
-                  currentPageIndex === 0 && "cursor-not-allowed opacity-50"
-                }`}
-              >
-                Previous
-              </button>
-              <button
-                onClick={handleNextPage}
-                disabled={currentPageIndex === flow.pages.length - 1}
-                className={`bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 ${
-                  currentPageIndex === flow.pages.length - 1 &&
-                  "cursor-not-allowed opacity-50"
-                }`}
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div>
-            {/* Editing functionality remains here */}
-          </div>
-        )}
-      </div>
+                {/* Navigation Buttons */}
+                <div className="flex justify-between mt-6">
+                  <button
+                    onClick={handlePreviousPage}
+                    disabled={currentPageIndex === 0}
+                    className={`bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 ${currentPageIndex === 0 && "cursor-not-allowed opacity-50"}`}
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={handleNextPage}
+                    disabled={currentPageIndex === flow.pages.length - 1}
+                    className={`bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 ${currentPageIndex === flow.pages.length - 1 &&
+                      "cursor-not-allowed opacity-50"}`}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                {/* Editing functionality remains here */}
+              </div>
+            )}
+          </div></>
+      )}
+      {isPlayMode && (
+        <div className="p-6">
+          <button
+            onClick={() => setIsPlayMode(false)}
+            className="px-4 py-2 rounded bg-red-500 hover:bg-red-600 text-white"
+          >
+            Exit Play Mode
+          </button>
+          <PlayMode flow={flow} onExit={() => setIsPlayMode(false)} />
+        </div>
+      )}
     </div>
   );
 }

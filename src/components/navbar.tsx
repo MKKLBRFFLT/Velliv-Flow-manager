@@ -1,23 +1,19 @@
-'use client';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+"use client";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 type LeftNavBarProps = {
-  onQuestionTypeChange?: (
-    type: 'number' | 'text' | 'checkbox' | 'calendar' | 'multiple-choice' | 'dropdown'
-  ) => void;
-  flowName?: string;
-  isPlayMode?: boolean; // New prop to determine if Play Mode is active
+  onQuestionTypeChange?: (type: 'number' | 'text' | 'checkbox' | 'calendar' | 'multiple-choice' | 'dropdown') => void;
+  flowName?: string; 
 };
 
 export default function LeftNavBar({
   onQuestionTypeChange,
   flowName,
-  isPlayMode = false, // Default to false
 }: LeftNavBarProps) {
   const pathname = usePathname();
 
-  const isEditingFlow = pathname.startsWith('/flow/');
+  const isEditingFlow = pathname.startsWith("/flow/");
 
   const handleNavAway = (e: React.MouseEvent<HTMLAnchorElement>) => {
     const confirmation = window.confirm(
@@ -31,7 +27,7 @@ export default function LeftNavBar({
   return (
     <nav
       className="fixed left-0 top-0 h-full w-48 flex flex-col items-start p-6 space-y-4"
-      style={{ backgroundColor: '#006e64' }}
+      style={{ backgroundColor: "#006e64" }}
     >
       <h1 className="text-white">Tools</h1>
       <Link
@@ -41,12 +37,12 @@ export default function LeftNavBar({
       >
         Home
       </Link>
-      {isEditingFlow && !isPlayMode && ( // Hide tools in Play Mode
+      {isEditingFlow && (
         <div className="flex flex-col text-xl space-y-4 text-white">
-          <button onClick={() => onQuestionTypeChange?.('number')}>
+          <button onClick={() => onQuestionTypeChange?.("number")}>
             Numeric Question
           </button>
-          <button onClick={() => onQuestionTypeChange?.('text')}>
+          <button onClick={() => onQuestionTypeChange?.("text")}>
             Text Question
           </button>
           <button onClick={() => onQuestionTypeChange?.('multiple-choice')}>
