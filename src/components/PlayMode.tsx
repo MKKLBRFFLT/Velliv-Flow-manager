@@ -43,13 +43,16 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
 
   const currentPage = flow.pages[currentPageIndex];
 
+  // Handle changes to answers
   const handleAnswerChange = (index: number, value: string | number | string[]) => {
     setAnswers((prev) => ({ ...prev, [currentPageIndex * 100 + index]: value }));
   };
 
+  // Navigate to the next page
   const handleNextPage = () => {
     const currentAnswers = answers;
 
+    // Check post-conditions
     const matchedPostCondition = currentPage.postConditions?.find((condition) => {
       const answer = currentAnswers[currentPageIndex * 100 + condition.condition.questionIndex];
       return answer === condition.condition.value;
@@ -63,9 +66,18 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
       }
     }
 
+    // End the flow if no matching post-condition is found
     setIsEnd(true);
   };
 
+  // Navigate to the previous page
+  const handlePreviousPage = () => {
+    if (currentPageIndex > 0) {
+      setCurrentPageIndex((prevIndex) => prevIndex - 1);
+    }
+  };
+
+  // Check if the current page can be accessed (all pre-conditions met)
   const canEnterPage = (page: Page): boolean => {
     return (
       page.preConditions?.every((condition) => {
@@ -76,6 +88,7 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
   };
 
   if (isEnd) {
+    // End page displaying answers
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
@@ -107,6 +120,7 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
   }
 
   if (!canEnterPage(currentPage)) {
+    // Redirect to end if conditions for the current page aren't met
     setIsEnd(true);
     return null;
   }
@@ -174,16 +188,24 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
             </li>
           ))}
         </ul>
-        <button
-          onClick={handleNextPage}
-          className="bg-green-500 text-white px-4 py-2 rounded mt-4 hover:bg-green-600"
-        >
-          Next
-        </button>
+        <div className="flex justify-between mt-4">
+          <button
+            onClick={handlePreviousPage}
+            disabled={currentPageIndex === 0}
+            className={`bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400 ${
+              currentPageIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+          >
+            Back
+          </button>
+          <button
+            onClick={handleNextPage}
+            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );
 }
-
-
-
