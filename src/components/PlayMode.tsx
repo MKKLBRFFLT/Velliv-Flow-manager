@@ -79,8 +79,8 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-          <h2 className="text-2xl font-bold mb-4">Flow er afsluttet</h2>
-          <h3 className="text-lg font-semibold mb-2">Du har svaret:</h3>
+          <h2 className="text-2xl font-bold mb-4">Flow Completed</h2>
+          <h3 className="text-lg font-semibold mb-2">Your Answers:</h3>
           <ul className="list-disc ml-6">
             {flow.pages.map((page, pageIndex) => (
               <li key={pageIndex} className="mb-4">
@@ -156,6 +156,13 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
                     </button>
                   ))}
                 </div>
+              ) : q.inputType === 'calendar' ? (
+                <input
+                  type="date"
+                  value={answers[currentPageIndex * 100 + index] || ''}
+                  onChange={(e) => handleAnswerChange(index, e.target.value)}
+                  className="border p-2 rounded w-full"
+                />
               ) : (
                 <input
                   type="text"
@@ -177,5 +184,6 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
     </div>
   );
 }
+
 
 
