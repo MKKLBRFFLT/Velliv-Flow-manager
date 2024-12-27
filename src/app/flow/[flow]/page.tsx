@@ -294,9 +294,24 @@ export default function FlowEditor() {
             </button>
 
             {isPlayMode && <PlayMode flow={flow} onExit={() => setIsPlayMode(false)} />}
-            {isVisualizationMode && <FlowVisualization
-              flow={flow}
-              onSwitchPage={(pageIndex) => setCurrentPageIndex(pageIndex)} />}
+            {isVisualizationMode && (
+              <FlowVisualization
+                flow={flow}
+                onSwitchPage={(pageIndex) => setCurrentPageIndex(pageIndex)}
+                onDeletePage={(pageId) => {
+                  // Filter out the page with the matching ID
+                  const updatedPages = flow.pages.filter((page) => page.id !== pageId);
+
+                  // Update the flow with the remaining pages
+                  setFlow({ ...flow, pages: updatedPages });
+
+                  // Adjust the current page index if necessary
+                  if (currentPageIndex >= updatedPages.length) {
+                    setCurrentPageIndex(Math.max(0, updatedPages.length - 1));
+                  }
+                }}
+              />
+            )}
 
             {/* Page Navigation */}
             <div className="flex space-x-2 mb-4">
@@ -643,55 +658,6 @@ export default function FlowEditor() {
 
             {isPreview ? (
               <div>
-                {/*             <h2 className="text-xl font-semibold mb-4">
-              {flow.pages[currentPageIndex]?.name}
-            </h2>
-            <ul className="space-y-4">
-              {flow.pages[currentPageIndex]?.questions.map((q, index) => (
-                <li
-                  key={index}
-                  className="border p-4 rounded shadow-sm bg-gray-50"
-                >
-                  <p className="font-medium">{q.text}</p>
-                  {q.inputType === "number" ? (
-                    <input
-                      type="number"
-                      onChange={(e) =>
-                        handleAnswerChange(index, Number(e.target.value))
-                      }
-                      className="border p-2 rounded w-full"
-                    />
-                  ) : q.inputType === "text" ? (
-                    <input
-                      type="text"
-                      onChange={(e) =>
-                        handleAnswerChange(index, e.target.value)
-                      }
-                      className="border p-2 rounded w-full"
-                    />
-                  ) : q.inputType === "multiple-choice" ? (
-                    <div className="mt-2">
-                      {q.answers?.map((answer, answerIndex) => (
-                        <button
-                          key={answerIndex}
-                          onClick={() =>
-                            handleAnswerChange(index, answer)
-                          }
-                          className={`border p-2 rounded w-full text-left ${
-                            previewAnswers[index] === answer
-                              ? "bg-blue-100"
-                              : ""
-                          }`}
-                        >
-                          {answer}
-                        </button>
-                      ))}
-                    </div>
-                  ) : null}
-                </li>
-              ))}
-            </ul> */}
-
                 {/* Navigation Buttons */}
                 <div className="flex justify-between mt-6">
                   <button
