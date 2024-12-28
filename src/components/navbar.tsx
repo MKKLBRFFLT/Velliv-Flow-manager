@@ -29,7 +29,6 @@ export default function LeftNavBar({
       className="fixed left-0 top-0 h-full w-48 flex flex-col items-start p-6 space-y-4"
       style={{ backgroundColor: "#006e64" }}
     >
-      <h1 className="text-white">Tools</h1>
       <Link
         href="/"
         className="text-white hover:underline"
@@ -62,3 +61,4 @@ export default function LeftNavBar({
     </nav>
   );
 }
+
