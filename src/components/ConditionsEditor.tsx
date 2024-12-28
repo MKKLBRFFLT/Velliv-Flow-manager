@@ -2,31 +2,8 @@
 
 import React, { useState } from "react";
 
-type PreCondition = {
-  questionIndex: number;
-  expectedValue: string | number | string[];
-};
+import { Page, PreCondition, PostCondition } from "@/utils/types"; // Import shared types
 
-type PostCondition = {
-  condition: {
-    questionIndex: number;
-    value: string | number | string[];
-  };
-  nextPageId: string;
-};
-
-type Question = {
-  text: string;
-  inputType: string;
-};
-
-type Page = {
-  id: string;
-  name: string;
-  questions: Question[];
-  preConditions?: PreCondition[];
-  postConditions?: PostCondition[];
-};
 
 type ConditionsEditorProps = {
   page: Page;
@@ -49,25 +26,31 @@ export default function ConditionsEditor({
   const [preConditionQuestionIndex, setPreConditionQuestionIndex] =
     useState<number>(-1);
   const [preConditionExpectedValue, setPreConditionExpectedValue] =
-    useState<string | number | string[]>("");
+    useState<string | number>("");
+  const [preConditionOperator, setPreConditionOperator] =
+    useState<string>("="); // Default operator
 
   const [postConditionQuestionIndex, setPostConditionQuestionIndex] =
     useState<number>(-1);
-  const [postConditionValue, setPostConditionValue] =
-    useState<string | number | string[]>("");
+  const [postConditionValue, setPostConditionValue] = useState<string | number>(
+    ""
+  );
+  const [postConditionOperator, setPostConditionOperator] =
+    useState<string>("="); // Default operator
   const [postConditionNextPageId, setPostConditionNextPageId] =
     useState<string>("");
 
-  // Helper to reset fields
   const resetPreConditionFields = () => {
     setPreConditionPageId("");
     setPreConditionQuestionIndex(-1);
     setPreConditionExpectedValue("");
+    setPreConditionOperator("=");
   };
 
   const resetPostConditionFields = () => {
     setPostConditionQuestionIndex(-1);
     setPostConditionValue("");
+    setPostConditionOperator("=");
     setPostConditionNextPageId("");
   };
 
@@ -84,6 +67,7 @@ export default function ConditionsEditor({
     onAddPreCondition({
       questionIndex: preConditionQuestionIndex,
       expectedValue: preConditionExpectedValue,
+      operator: preConditionOperator,
     });
 
     resetPreConditionFields();
@@ -96,7 +80,7 @@ export default function ConditionsEditor({
       postConditionNextPageId === ""
     ) {
       alert(
-        "Please select a question, input a value, and choose the next page."
+        "Please select a question, input a value, choose an operator, and select the next page."
       );
       return;
     }
@@ -105,12 +89,54 @@ export default function ConditionsEditor({
       condition: {
         questionIndex: postConditionQuestionIndex,
         value: postConditionValue,
+        operator: postConditionOperator,
       },
       nextPageId: postConditionNextPageId,
     });
 
     resetPostConditionFields();
   };
+
+  const getInputField = (
+    inputType: string,
+    value: string | number,
+    onChange: (value: string | number) => void
+  ) => {
+    return inputType === "number" ? (
+      <input
+        type="number"
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="border p-2 rounded"
+        placeholder="Enter numeric value"
+      />
+    ) : (
+      <input
+        type="text"
+        value={value as string}
+        onChange={(e) => onChange(e.target.value)}
+        className="border p-2 rounded"
+        placeholder="Enter value"
+      />
+    );
+  };
+
+  const getOperatorDropdown = (
+    operator: string,
+    setOperator: (value: string) => void
+  ) => (
+    <select
+      value={operator}
+      onChange={(e) => setOperator(e.target.value)}
+      className="border p-2 rounded"
+    >
+      <option value="=">=</option>
+      <option value=">">{">"}</option>
+      <option value="<">{"<"}</option>
+      <option value=">=">≥</option>
+      <option value="<=">≤</option>
+    </select>
+  );
 
   return (
     <div className="border p-4 rounded">
@@ -128,8 +154,10 @@ export default function ConditionsEditor({
               className="border p-2 rounded mb-2 flex justify-between items-center"
             >
               <span>
-                Question {cond.questionIndex + 1} from another page: Expected
-                Value: <strong>{cond.expectedValue}</strong>
+                Question {cond.questionIndex + 1} from another page:{" "}
+                <strong>
+                  {cond.operator} {cond.expectedValue}
+                </strong>
               </span>
               <button
                 onClick={() => onDeletePreCondition(index)}
@@ -149,7 +177,7 @@ export default function ConditionsEditor({
           >
             <option value="">Select a page</option>
             {allPages
-              .filter((p) => p.id !== page.id) // Exclude the current page
+              .filter((p) => p.id !== page.id)
               .map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name}
@@ -159,7 +187,9 @@ export default function ConditionsEditor({
           {preConditionPageId && (
             <select
               value={preConditionQuestionIndex}
-              onChange={(e) => setPreConditionQuestionIndex(Number(e.target.value))}
+              onChange={(e) =>
+                setPreConditionQuestionIndex(Number(e.target.value))
+              }
               className="border p-2 rounded"
             >
               <option value="-1">Select a question</option>
@@ -172,13 +202,19 @@ export default function ConditionsEditor({
                 ))}
             </select>
           )}
-          <input
-            type="text"
-            placeholder="Expected value"
-            value={preConditionExpectedValue as string}
-            onChange={(e) => setPreConditionExpectedValue(e.target.value)}
-            className="border p-2 rounded"
-          />
+          {preConditionQuestionIndex >= 0 &&
+            allPages
+              .find((p) => p.id === preConditionPageId)
+              ?.questions[preConditionQuestionIndex].inputType === "number" &&
+            getOperatorDropdown(preConditionOperator, setPreConditionOperator)}
+          {preConditionQuestionIndex >= 0 &&
+            getInputField(
+              allPages
+                .find((p) => p.id === preConditionPageId)
+                ?.questions[preConditionQuestionIndex].inputType || "text",
+              preConditionExpectedValue,
+              setPreConditionExpectedValue
+            )}
           <button
             onClick={handleAddPreCondition}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
@@ -198,7 +234,8 @@ export default function ConditionsEditor({
               className="border p-2 rounded mb-2 flex justify-between items-center"
             >
               <span>
-                If Question {cond.condition.questionIndex + 1} ={" "}
+                If Question {cond.condition.questionIndex + 1}{" "}
+                <strong>{cond.condition.operator}</strong>{" "}
                 <strong>{cond.condition.value}</strong>, go to page{" "}
                 <strong>{cond.nextPageId}</strong>
               </span>
@@ -215,7 +252,9 @@ export default function ConditionsEditor({
         <div className="flex flex-col space-y-2">
           <select
             value={postConditionQuestionIndex}
-            onChange={(e) => setPostConditionQuestionIndex(Number(e.target.value))}
+            onChange={(e) =>
+              setPostConditionQuestionIndex(Number(e.target.value))
+            }
             className="border p-2 rounded"
           >
             <option value="-1">Select a question</option>
@@ -225,13 +264,15 @@ export default function ConditionsEditor({
               </option>
             ))}
           </select>
-          <input
-            type="text"
-            placeholder="Value"
-            value={postConditionValue as string}
-            onChange={(e) => setPostConditionValue(e.target.value)}
-            className="border p-2 rounded"
-          />
+          {postConditionQuestionIndex >= 0 &&
+            page.questions[postConditionQuestionIndex].inputType === "number" &&
+            getOperatorDropdown(postConditionOperator, setPostConditionOperator)}
+          {postConditionQuestionIndex >= 0 &&
+            getInputField(
+              page.questions[postConditionQuestionIndex].inputType,
+              postConditionValue,
+              setPostConditionValue
+            )}
           <select
             value={postConditionNextPageId}
             onChange={(e) => setPostConditionNextPageId(e.target.value)}
@@ -255,8 +296,3 @@ export default function ConditionsEditor({
     </div>
   );
 }
-
-
-
-
-

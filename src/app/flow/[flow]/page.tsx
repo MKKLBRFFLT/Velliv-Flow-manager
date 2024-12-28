@@ -13,49 +13,30 @@ import FlowVisualization from "../../../components/FlowVisualization";
 import { updateFlow } from "@/utils/flowStorage";
 import ConditionsEditor from "../../../components/ConditionsEditor";
 import PlayMode from "@/components/PlayMode";
+import { Flow, Page, Question } from "@/utils/types";
 
-type Question = {
-  text: string;
-  inputType:
-    | "number"
-    | "text"
-    | "multiple-choice"
-    | "checkbox"
-    | "calendar"
-    | "dropdown";
-  placeholder?: string;
-  answers?: string[];
-  allowMultipleAnswers?: boolean;
-  options?: string[];
+
+const evaluateCondition = (
+  operator: string,
+  userAnswer: number,
+  conditionValue: number
+): boolean => {
+  switch (operator) {
+    case "=":
+      return userAnswer === conditionValue;
+    case ">":
+      return userAnswer > conditionValue;
+    case "<":
+      return userAnswer < conditionValue;
+    case ">=":
+      return userAnswer >= conditionValue;
+    case "<=":
+      return userAnswer <= conditionValue;
+    default:
+      return false;
+  }
 };
 
-type PreCondition = {
-  questionIndex: number; // Index of the question to evaluate
-  expectedValue: string | number | string[]; // Value to match
-};
-
-type PostCondition = {
-  condition: {
-    questionIndex: number; // Index of the question to evaluate
-    value: string | number | string[]; // Value to match
-  };
-  nextPageId: string; // ID of the next page if condition is met
-};
-
-type Page = {
-  id: string;
-  name: string;
-  questions: Question[];
-  preConditions?: PreCondition[]; // Optional pre-conditions
-  postConditions?: PostCondition[]; // Optional post-conditions
-};
-
-type Flow = {
-  id: string;
-  name: string;
-  description: string;
-  pages: Page[];
-};
 
 export default function FlowEditor() {
   const params = useParams();
@@ -195,18 +176,25 @@ export default function FlowEditor() {
 
   const handleNextPage = () => {
     if (!flow) return;
-
+  
     const currentPage = flow.pages[currentPageIndex];
-
     let nextPageIndex = currentPageIndex + 1; // Default to sequential navigation
-
+  
     // Evaluate post-conditions on the current page
     if (currentPage.postConditions?.length) {
       const matchedPostCondition = currentPage.postConditions.find((condition) => {
         const userAnswer = previewAnswers[condition.condition.questionIndex]; // User's input
-        return userAnswer === condition.condition.value; // Match post-condition
+        const conditionValue = condition.condition.value;
+        const operator = condition.condition.operator || "=";
+  
+        if (typeof userAnswer === "number" && typeof conditionValue === "number") {
+          return evaluateCondition(operator, userAnswer, conditionValue);
+        }
+  
+        // Fallback for non-numeric conditions (exact match)
+        return userAnswer === conditionValue;
       });
-
+  
       if (matchedPostCondition) {
         const targetPageIndex = flow.pages.findIndex(
           (page) => page.id === matchedPostCondition.nextPageId
@@ -218,28 +206,37 @@ export default function FlowEditor() {
         }
       }
     }
-
+  
     // Evaluate pre-conditions for subsequent pages
     const nextPageWithPreCondition = flow.pages.findIndex((page, pageIndex) => {
       if (pageIndex <= currentPageIndex) return false; // Skip current and previous pages
-
+  
       return (
         page.preConditions?.every((condition) => {
           const userAnswer = previewAnswers[condition.questionIndex]; // User's input
-          return userAnswer === condition.expectedValue; // Match pre-condition
+          const conditionValue = condition.expectedValue;
+          const operator = condition.operator || "=";
+  
+          if (typeof userAnswer === "number" && typeof conditionValue === "number") {
+            return evaluateCondition(operator, userAnswer, conditionValue);
+          }
+  
+          // Fallback for non-numeric conditions (exact match)
+          return userAnswer === conditionValue;
         }) ?? false
       );
     });
-
+  
     if (nextPageWithPreCondition !== -1) {
       nextPageIndex = nextPageWithPreCondition;
     }
-
+  
     // Update to the determined next page if valid
     if (nextPageIndex < flow.pages.length) {
       setCurrentPageIndex(nextPageIndex);
     }
   };
+  
 
   const handlePreviousPage = () => {
     if (currentPageIndex > 0) {

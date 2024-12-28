@@ -19,7 +19,17 @@ type Question = {
 
 type PreCondition = {
   questionIndex: number;
-  expectedValue: string | number | string[];
+  expectedValue: string | number;
+  operator?: string;
+};
+
+type PostCondition = {
+  condition: {
+    questionIndex: number;
+    value: string | number;
+    operator?: string;
+  };
+  nextPageId: string;
 };
 
 type Page = {
@@ -27,18 +37,15 @@ type Page = {
   name: string;
   questions: Question[];
   preConditions?: PreCondition[];
-  postConditions?: Array<{
-    condition: { questionIndex: number; value: string | number | string[] };
-    nextPageId: string;
-  }>;
+  postConditions?: PostCondition[];
 };
 
 type FlowVisualizationProps = {
   flow: {
     pages: Page[];
   };
-  onSwitchPage: (pageIndex: number) => void; // Callback to switch pages in the editor
-  onDeletePage: (pageId: string) => void; // Callback to delete a page
+  onSwitchPage: (pageIndex: number) => void;
+  onDeletePage: (pageId: string) => void;
 };
 
 const LOCAL_STORAGE_KEY_NODES = "flow-visualization-nodes";
@@ -112,11 +119,12 @@ export default function FlowVisualization({ flow, onSwitchPage, onDeletePage }: 
       page.postConditions?.map((condition, index) => {
         const targetPage = flow.pages.find((p) => p.id === condition.nextPageId);
         if (targetPage) {
+          const operator = condition.condition.operator || "="; // Default to "=" if no operator
           return {
             id: `post-edge-${page.id}-${index}`,
             source: `page-${page.id}`,
             target: `page-${targetPage.id}`,
-            label: `If "${condition.condition.value}"`,
+            label: `If Question ${condition.condition.questionIndex + 1} ${operator} "${condition.condition.value}"`,
             labelStyle: { fill: "#FFA032", fontWeight: "bold" },
             animated: true,
             markerEnd: {
@@ -136,11 +144,12 @@ export default function FlowVisualization({ flow, onSwitchPage, onDeletePage }: 
           (p) => p.questions.length > condition.questionIndex && flow.pages.indexOf(p) < pageIndex
         );
         if (sourcePage) {
+          const operator = condition.operator || "="; // Default to "=" if no operator
           return {
             id: `pre-edge-${page.id}-${index}`,
             source: `page-${sourcePage.id}`,
             target: `page-${page.id}`,
-            label: `Depends on "${condition.expectedValue}"`,
+            label: `Depends on Question ${condition.questionIndex + 1} ${operator} "${condition.expectedValue}"`,
             labelStyle: { fill: "#4CAF50", fontWeight: "bold" },
             animated: true,
             markerEnd: {
@@ -192,4 +201,5 @@ export default function FlowVisualization({ flow, onSwitchPage, onDeletePage }: 
     </div>
   );
 }
+
 

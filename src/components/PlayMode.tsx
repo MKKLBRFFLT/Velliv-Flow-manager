@@ -2,6 +2,28 @@
 
 import React, { useState } from "react";
 
+const evaluateCondition = (
+  operator: string,
+  userAnswer: number,
+  conditionValue: number
+): boolean => {
+  switch (operator) {
+    case "=":
+      return userAnswer === conditionValue;
+    case ">":
+      return userAnswer > conditionValue;
+    case "<":
+      return userAnswer < conditionValue;
+    case ">=":
+      return userAnswer >= conditionValue;
+    case "<=":
+      return userAnswer <= conditionValue;
+    default:
+      return false; // Fallback for unsupported operators
+  }
+};
+
+
 type Question = {
   text: string;
   inputType: string;
@@ -10,13 +32,18 @@ type Question = {
 };
 
 type PreCondition = {
-  questionIndex: number;
-  expectedValue: string | number | string[];
+  questionIndex: number; // Index of the question to evaluate
+  expectedValue: string | number | string[]; // Value to match
+  operator?: string; // Optional operator ('=', '>', '<', '>=', '<=')
 };
 
 type PostCondition = {
-  condition: { questionIndex: number; value: string | number | string[] };
-  nextPageId: string;
+  condition: {
+    questionIndex: number; // Index of the question to evaluate
+    value: string | number | string[]; // Value to match
+    operator?: string; // Optional operator ('=', '>', '<', '>=', '<=')
+  };
+  nextPageId: string; // ID of the next page if condition is met
 };
 
 type Page = {
@@ -44,17 +71,29 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
   const currentPage = flow.pages[currentPageIndex];
 
   const handleAnswerChange = (index: number, value: string | number | string[]) => {
-    setAnswers((prev) => ({ ...prev, [currentPageIndex * 100 + index]: value }));
+    setAnswers((prev) => ({
+      ...prev,
+      [currentPageIndex * 100 + index]: typeof value === "string" && !isNaN(Number(value)) ? Number(value) : value,
+    }));
   };
+  
 
   const handleNextPage = () => {
     const currentAnswers = answers;
-
+  
     const matchedPostCondition = currentPage.postConditions?.find((condition) => {
       const answer = currentAnswers[currentPageIndex * 100 + condition.condition.questionIndex];
-      return answer === condition.condition.value;
+      const conditionValue = condition.condition.value;
+      const operator = condition.condition.operator || "=";
+  
+      if (typeof answer === "number" && typeof conditionValue === "number") {
+        return evaluateCondition(operator, answer, conditionValue);
+      }
+  
+      // Fallback for non-numeric conditions (exact match)
+      return answer === conditionValue;
     });
-
+  
     if (matchedPostCondition) {
       const nextPageIndex = flow.pages.findIndex((page) => page.id === matchedPostCondition.nextPageId);
       if (nextPageIndex !== -1) {
@@ -62,9 +101,10 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
         return;
       }
     }
-
-    setIsEnd(true);
+  
+    setIsEnd(true); // If no conditions are matched, end the flow
   };
+  
 
   const handlePreviousPage = () => {
     if (currentPageIndex > 0) {
@@ -76,10 +116,19 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
     return (
       page.preConditions?.every((condition) => {
         const answer = answers[currentPageIndex * 100 + condition.questionIndex];
-        return answer === condition.expectedValue;
+        const conditionValue = condition.expectedValue;
+        const operator = condition.operator || "=";
+  
+        if (typeof answer === "number" && typeof conditionValue === "number") {
+          return evaluateCondition(operator, answer, conditionValue);
+        }
+  
+        // Fallback for non-numeric conditions (exact match)
+        return answer === conditionValue;
       }) ?? true
     );
   };
+  
 
   if (isEnd) {
     return (

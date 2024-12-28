@@ -40,8 +40,3 @@ export default function NumericQuestion({ onAddQuestion }: NumericQuestionProps)
     </div>
   );
 }
-
-
-
-
-
