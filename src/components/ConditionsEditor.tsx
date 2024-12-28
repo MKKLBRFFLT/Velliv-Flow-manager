@@ -1,21 +1,23 @@
+"use client";
+
 import React, { useState } from "react";
 
 type PreCondition = {
   questionIndex: number;
-  expectedValue: string | number;
+  expectedValue: string | number | string[];
 };
 
 type PostCondition = {
   condition: {
     questionIndex: number;
-    value: string | number;
+    value: string | number | string[];
   };
   nextPageId: string;
 };
 
 type Question = {
   text: string;
-  inputType: "text" | "number";
+  inputType: string;
 };
 
 type Page = {
@@ -47,15 +49,16 @@ export default function ConditionsEditor({
   const [preConditionQuestionIndex, setPreConditionQuestionIndex] =
     useState<number>(-1);
   const [preConditionExpectedValue, setPreConditionExpectedValue] =
-    useState<string | number>("");
+    useState<string | number | string[]>("");
 
   const [postConditionQuestionIndex, setPostConditionQuestionIndex] =
     useState<number>(-1);
   const [postConditionValue, setPostConditionValue] =
-    useState<string | number>("");
+    useState<string | number | string[]>("");
   const [postConditionNextPageId, setPostConditionNextPageId] =
     useState<string>("");
 
+  // Helper to reset fields
   const resetPreConditionFields = () => {
     setPreConditionPageId("");
     setPreConditionQuestionIndex(-1);
@@ -107,34 +110,6 @@ export default function ConditionsEditor({
     });
 
     resetPostConditionFields();
-  };
-
-  const renderValueInput = (
-    question: Question,
-    value: string | number,
-    setValue: (val: string | number) => void
-  ) => {
-    if (question.inputType === "number") {
-      return (
-        <input
-          type="number"
-          value={value as number}
-          onChange={(e) => setValue(Number(e.target.value))}
-          className="border p-2 rounded"
-          placeholder="Enter a number"
-        />
-      );
-    }
-
-    return (
-      <input
-        type="text"
-        value={value as string}
-        onChange={(e) => setValue(e.target.value)}
-        className="border p-2 rounded"
-        placeholder="Enter text"
-      />
-    );
   };
 
   return (
@@ -197,14 +172,13 @@ export default function ConditionsEditor({
                 ))}
             </select>
           )}
-          {preConditionQuestionIndex >= 0 &&
-            renderValueInput(
-              allPages
-                .find((p) => p.id === preConditionPageId)
-                ?.questions[preConditionQuestionIndex]!,
-              preConditionExpectedValue,
-              setPreConditionExpectedValue
-            )}
+          <input
+            type="text"
+            placeholder="Expected value"
+            value={preConditionExpectedValue as string}
+            onChange={(e) => setPreConditionExpectedValue(e.target.value)}
+            className="border p-2 rounded"
+          />
           <button
             onClick={handleAddPreCondition}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
@@ -251,12 +225,13 @@ export default function ConditionsEditor({
               </option>
             ))}
           </select>
-          {postConditionQuestionIndex >= 0 &&
-            renderValueInput(
-              page.questions[postConditionQuestionIndex],
-              postConditionValue,
-              setPostConditionValue
-            )}
+          <input
+            type="text"
+            placeholder="Value"
+            value={postConditionValue as string}
+            onChange={(e) => setPostConditionValue(e.target.value)}
+            className="border p-2 rounded"
+          />
           <select
             value={postConditionNextPageId}
             onChange={(e) => setPostConditionNextPageId(e.target.value)}
