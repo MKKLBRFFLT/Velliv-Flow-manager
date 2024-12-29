@@ -207,30 +207,6 @@ export default function FlowEditor() {
       }
     }
   
-    // Evaluate pre-conditions for subsequent pages
-    const nextPageWithPreCondition = flow.pages.findIndex((page, pageIndex) => {
-      if (pageIndex <= currentPageIndex) return false; // Skip current and previous pages
-  
-      return (
-        page.preConditions?.every((condition) => {
-          const userAnswer = previewAnswers[condition.questionIndex]; // User's input
-          const conditionValue = condition.expectedValue;
-          const operator = condition.operator || "=";
-  
-          if (typeof userAnswer === "number" && typeof conditionValue === "number") {
-            return evaluateCondition(operator, userAnswer, conditionValue);
-          }
-  
-          // Fallback for non-numeric conditions (exact match)
-          return userAnswer === conditionValue;
-        }) ?? false
-      );
-    });
-  
-    if (nextPageWithPreCondition !== -1) {
-      nextPageIndex = nextPageWithPreCondition;
-    }
-  
     // Update to the determined next page if valid
     if (nextPageIndex < flow.pages.length) {
       setCurrentPageIndex(nextPageIndex);
@@ -476,30 +452,6 @@ export default function FlowEditor() {
                 <ConditionsEditor
                   page={flow.pages[currentPageIndex]}
                   allPages={flow.pages}
-                  onAddPreCondition={(preCondition) => {
-                    const updatedPages = flow.pages.map((page, index) => index === currentPageIndex
-                      ? {
-                        ...page,
-                        preConditions: [...(page.preConditions || []), preCondition],
-                      }
-                      : page
-                    );
-                    const updatedFlow = { ...flow, pages: updatedPages };
-                    updateFlow(updatedFlow);
-                    setFlow(updatedFlow);
-                  } }
-                  onDeletePreCondition={(index) => {
-                    const updatedPages = flow.pages.map((page, pageIndex) => pageIndex === currentPageIndex
-                      ? {
-                        ...page,
-                        preConditions: page.preConditions?.filter((_, i) => i !== index),
-                      }
-                      : page
-                    );
-                    const updatedFlow = { ...flow, pages: updatedPages };
-                    updateFlow(updatedFlow);
-                    setFlow(updatedFlow);
-                  } }
                   onAddPostCondition={(postCondition) => {
                     const updatedPages = flow.pages.map((page, index) => index === currentPageIndex
                       ? {

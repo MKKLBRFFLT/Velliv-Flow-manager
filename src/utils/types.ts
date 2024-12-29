@@ -1,9 +1,3 @@
-export type PreCondition = {
-    questionIndex: number; // Index of the question to evaluate
-    expectedValue: string | number; // Consistent type
-    operator?: string; // Optional operator ('=', '>', '<', '>=', '<=')
-  };
-  
   export type PostCondition = {
     condition: {
       questionIndex: number; // Index of the question to evaluate
@@ -32,7 +26,6 @@ export type PreCondition = {
     id: string;
     name: string;
     questions: Question[];
-    preConditions?: PreCondition[]; // Optional pre-conditions
     postConditions?: PostCondition[]; // Optional post-conditions
   };
   

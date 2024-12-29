@@ -31,12 +31,6 @@ type Question = {
   allowMultipleAnswers?: boolean; // For allowing multiple selections
 };
 
-type PreCondition = {
-  questionIndex: number; // Index of the question to evaluate
-  expectedValue: string | number | string[]; // Value to match
-  operator?: string; // Optional operator ('=', '>', '<', '>=', '<=')
-};
-
 type PostCondition = {
   condition: {
     questionIndex: number; // Index of the question to evaluate
@@ -50,7 +44,6 @@ type Page = {
   id: string;
   name: string;
   questions: Question[];
-  preConditions?: PreCondition[];
   postConditions?: PostCondition[];
 };
 
@@ -112,24 +105,6 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
     }
   };
 
-  const canEnterPage = (page: Page): boolean => {
-    return (
-      page.preConditions?.every((condition) => {
-        const answer = answers[currentPageIndex * 100 + condition.questionIndex];
-        const conditionValue = condition.expectedValue;
-        const operator = condition.operator || "=";
-  
-        if (typeof answer === "number" && typeof conditionValue === "number") {
-          return evaluateCondition(operator, answer, conditionValue);
-        }
-  
-        // Fallback for non-numeric conditions (exact match)
-        return answer === conditionValue;
-      }) ?? true
-    );
-  };
-  
-
   if (isEnd) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -161,10 +136,6 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
     );
   }
 
-  if (!canEnterPage(currentPage)) {
-    setIsEnd(true);
-    return null;
-  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">

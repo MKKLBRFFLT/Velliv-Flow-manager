@@ -17,12 +17,6 @@ type Question = {
   inputType: string;
 };
 
-type PreCondition = {
-  questionIndex: number;
-  expectedValue: string | number;
-  operator?: string;
-};
-
 type PostCondition = {
   condition: {
     questionIndex: number;
@@ -36,7 +30,6 @@ type Page = {
   id: string;
   name: string;
   questions: Question[];
-  preConditions?: PreCondition[];
   postConditions?: PostCondition[];
 };
 
@@ -138,32 +131,7 @@ export default function FlowVisualization({ flow, onSwitchPage, onDeletePage }: 
       }) || []
     ).filter((edge) => edge !== null);
 
-    const preConditionEdges: Edge[] = flow.pages.flatMap((page, pageIndex) =>
-      page.preConditions?.map((condition, index) => {
-        const sourcePage = flow.pages.find(
-          (p) => p.questions.length > condition.questionIndex && flow.pages.indexOf(p) < pageIndex
-        );
-        if (sourcePage) {
-          const operator = condition.operator || "="; // Default to "=" if no operator
-          return {
-            id: `pre-edge-${page.id}-${index}`,
-            source: `page-${sourcePage.id}`,
-            target: `page-${page.id}`,
-            label: `Depends on Question ${condition.questionIndex + 1} ${operator} "${condition.expectedValue}"`,
-            labelStyle: { fill: "#4CAF50", fontWeight: "bold" },
-            animated: true,
-            markerEnd: {
-              type: MarkerType.ArrowClosed,
-              color: "#4CAF50",
-            },
-            style: { stroke: "#4CAF50", strokeWidth: 2, strokeDasharray: "5 5" },
-          };
-        }
-        return null;
-      }) || []
-    ).filter((edge) => edge !== null);
-
-    const initialEdges = [...postConditionEdges, ...preConditionEdges];
+    const initialEdges = [...postConditionEdges];
 
     setNodes(initialNodes);
     setEdges(initialEdges as Edge[]);
