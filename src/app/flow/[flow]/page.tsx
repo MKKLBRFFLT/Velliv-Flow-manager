@@ -605,32 +605,28 @@ export default function FlowEditor() {
               {isPreview ? "Exit Preview Mode" : "Enter Preview Mode"}
             </button>
 
-            {isPreview ? (
-              <div>
-                {/* Navigation Buttons */}
-                <div className="flex justify-between mt-6">
-                  <button
-                    onClick={handlePreviousPage}
-                    disabled={currentPageIndex === 0}
-                    className={`bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 ${currentPageIndex === 0 && "cursor-not-allowed opacity-50"}`}
-                  >
-                    Previous
-                  </button>
-                  <button
-                    onClick={handleNextPage}
-                    disabled={currentPageIndex === flow.pages.length - 1}
-                    className={`bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 ${currentPageIndex === flow.pages.length - 1 &&
-                      "cursor-not-allowed opacity-50"}`}
-                  >
-                    Next
-                  </button>
-                </div>
+            {isPreview && (
+            <div>
+              {/* Navigation Buttons */}
+              <div className="flex justify-between mt-6">
+                <button
+                  onClick={handlePreviousPage}
+                  disabled={currentPageIndex === 0}
+                  className={`bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 ${currentPageIndex === 0 && "cursor-not-allowed opacity-50"}`}
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={handleNextPage}
+                  disabled={currentPageIndex === flow.pages.length - 1}
+                  className={`bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 ${currentPageIndex === flow.pages.length - 1 &&
+                    "cursor-not-allowed opacity-50"}`}
+                >
+                  Next
+                </button>
               </div>
-            ) : (
-              <div>
-                {/* Editing functionality remains here */}
-              </div>
-            )}
+            </div>
+          )}
           </div></>
       )}
       {isPlayMode && (

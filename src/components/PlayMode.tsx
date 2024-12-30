@@ -23,11 +23,11 @@ const evaluateCondition = (
   }
 };
 
-
 type Question = {
   text: string;
   inputType: string;
-  answers?: string[]; // For dropdown or multiple-choice questions
+  answers?: string[]; // For multiple-choice questions
+  options?: string[]; // For dropdown questions
   allowMultipleAnswers?: boolean; // For allowing multiple selections
 };
 
@@ -69,24 +69,23 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
       [currentPageIndex * 100 + index]: typeof value === "string" && !isNaN(Number(value)) ? Number(value) : value,
     }));
   };
-  
 
   const handleNextPage = () => {
     const currentAnswers = answers;
-  
+
     const matchedPostCondition = currentPage.postConditions?.find((condition) => {
       const answer = currentAnswers[currentPageIndex * 100 + condition.condition.questionIndex];
       const conditionValue = condition.condition.value;
       const operator = condition.condition.operator || "=";
-  
+
       if (typeof answer === "number" && typeof conditionValue === "number") {
         return evaluateCondition(operator, answer, conditionValue);
       }
-  
+
       // Fallback for non-numeric conditions (exact match)
       return answer === conditionValue;
     });
-  
+
     if (matchedPostCondition) {
       const nextPageIndex = flow.pages.findIndex((page) => page.id === matchedPostCondition.nextPageId);
       if (nextPageIndex !== -1) {
@@ -94,10 +93,9 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
         return;
       }
     }
-  
+
     setIsEnd(true); // If no conditions are matched, end the flow
   };
-  
 
   const handlePreviousPage = () => {
     if (currentPageIndex > 0) {
@@ -136,7 +134,6 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
     );
   }
 
-
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
@@ -152,19 +149,13 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
                   onChange={(e) => handleAnswerChange(index, Number(e.target.value))}
                   className="border p-2 rounded w-full"
                 />
-              ) : q.inputType === "dropdown" && q.answers ? (
-                <select
+              ) : q.inputType === "text" ? (
+                <input
+                  type="text"
                   value={answers[currentPageIndex * 100 + index] || ""}
                   onChange={(e) => handleAnswerChange(index, e.target.value)}
                   className="border p-2 rounded w-full"
-                >
-                  <option value="">Select an answer</option>
-                  {q.answers.map((option, idx) => (
-                    <option key={idx} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
+                />
               ) : q.inputType === "multiple-choice" && q.answers ? (
                 <div className="flex flex-col space-y-2">
                   {q.answers.map((option, optionIndex) => (
@@ -195,6 +186,47 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
                     </button>
                   ))}
                 </div>
+              ) : q.inputType === "dropdown" && q.options ? (
+                <select
+                  value={answers[currentPageIndex * 100 + index] || ""}
+                  onChange={(e) => handleAnswerChange(index, e.target.value)}
+                  className="border p-2 rounded w-full"
+                >
+                  <option value="">Select an option</option>
+                  {q.options.map((option, optionIndex) => (
+                    <option key={optionIndex} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              ) : q.inputType === "checkbox" && q.options ? (
+                <div className="mt-2">
+                  {q.options.map((option, optionIndex) => (
+                    <label key={optionIndex} className="flex items-center">
+                      <input
+                        type="checkbox"
+                        value={option}
+                        checked={Array.isArray(answers[currentPageIndex * 100 + index]) &&
+                          (answers[currentPageIndex * 100 + index] as string[]).includes(option)}
+                        onChange={(e) => {
+                          const currentAnswers = Array.isArray(answers[currentPageIndex * 100 + index])
+                            ? (answers[currentPageIndex * 100 + index] as string[])
+                            : [];
+                          if (e.target.checked) {
+                            handleAnswerChange(index, [...currentAnswers, option]);
+                          } else {
+                            handleAnswerChange(
+                              index,
+                              currentAnswers.filter((opt) => opt !== option)
+                            );
+                          }
+                        }}
+                        className="mr-2"
+                      />
+                      {option}
+                    </label>
+                  ))}
+                </div>
               ) : q.inputType === "calendar" ? (
                 <input
                   type="date"
@@ -202,14 +234,7 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
                   onChange={(e) => handleAnswerChange(index, e.target.value)}
                   className="border p-2 rounded w-full"
                 />
-              ) : (
-                <input
-                  type="text"
-                  value={answers[currentPageIndex * 100 + index] || ""}
-                  onChange={(e) => handleAnswerChange(index, e.target.value)}
-                  className="border p-2 rounded w-full"
-                />
-              )}
+              ) : null}
             </li>
           ))}
         </ul>
@@ -234,3 +259,4 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
     </div>
   );
 }
+
