@@ -248,23 +248,24 @@ export default function FlowEditor() {
             </h1>
             <p className="text-gray-600 mb-6">{flow.description}</p>
 
-            <button
-              onClick={() => setIsPlayMode((prev) => !prev)}
-              className={`px-4 py-2 rounded ${isPlayMode ? 'bg-red-500 hover:bg-red-600' : 'bg-purple-500 hover:bg-purple-600'} text-white`}
-            >
-              {isPlayMode ? 'Exit Play Mode' : 'Enter Play Mode'}
-            </button>
+            <div className="flex space-x-2 mb-4">
+              <button
+                onClick={() => setIsPlayMode((prev) => !prev)}
+                className={`px-4 py-2 rounded ${isPlayMode ? 'bg-red-500 hover:bg-red-600' : 'bg-purple-500 hover:bg-purple-600'} text-white`}
+              >
+                {isPlayMode ? 'Exit Play Mode' : 'Enter Play Mode'}
+              </button>
 
-
-            <button
-              type="button"
-              onClick={() => setIsVisualizationMode(!isVisualizationMode)}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              {isVisualizationMode
-                ? "Switch to Edit Mode"
-                : "Switch to Visualization Mode"}
-            </button>
+              <button
+                type="button"
+                onClick={() => setIsVisualizationMode(!isVisualizationMode)}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                {isVisualizationMode
+                  ? "Disable Visualization Mode"
+                  : "Enable Visualization Mode"}
+              </button>
+            </div>
 
             {isPlayMode && <PlayMode flow={flow} onExit={() => setIsPlayMode(false)} />}
             {isVisualizationMode && (
