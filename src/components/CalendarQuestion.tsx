@@ -32,7 +32,7 @@ export default function CalendarQuestion({ onAddQuestion }: CalendarQuestionProp
         className="border p-2 rounded w-full"
       />
       <button onClick={handleAddQuestion} className="bg-green-500 text-white px-4 py-2 rounded mt-2 hover:bg-green-600">
-        Add Question
+        Tilføj spørgsmål
       </button>
     </div>
   );

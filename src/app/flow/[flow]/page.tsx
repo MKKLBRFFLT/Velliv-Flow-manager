@@ -255,7 +255,7 @@ export default function FlowEditor() {
                 onClick={() => setIsPlayMode((prev) => !prev)}
                 className={`px-4 py-2 rounded ${isPlayMode ? 'bg-red-500 hover:bg-red-600' : 'bg-purple-500 hover:bg-purple-600'} text-white`}
               >
-                {isPlayMode ? 'Exit Play Mode' : 'Enter Play Mode'}
+                {isPlayMode ? 'Afslut Play Mode' : 'Gå ind i Play Mode'}
               </button>
 
               <button
@@ -264,8 +264,8 @@ export default function FlowEditor() {
                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
               >
                 {isVisualizationMode
-                  ? "Disable Visualization Mode"
-                  : "Enable Visualization Mode"}
+                  ? "Deaktiver Visualisering"
+                  : "Aktiver Visualisering"}
               </button>
             </div>
 
@@ -402,8 +402,8 @@ export default function FlowEditor() {
                             </li>
                           ))}
                           <p>
-                            Allow Multiple Answers:{" "}
-                            {q.allowMultipleAnswers ? "Yes" : "No"}
+                            Tillad flere svar:{" "}
+                            {q.allowMultipleAnswers ? "Ja" : "Nej"}
                           </p>
                         </ul>
                       )}
@@ -446,7 +446,7 @@ export default function FlowEditor() {
                         onClick={() => handleDeleteQuestion(index)}
                         className="bg-red-500 text-white px-2 py-1 rounded mt-2 hover:bg-red-600"
                       >
-                        Delete
+                        Slet
                       </button>
                     </li>
                   ))}
@@ -610,7 +610,7 @@ export default function FlowEditor() {
               onClick={() => setIsPreview(!isPreview)}
               className="bg-blue-500 text-white px-4 py-2 rounded mt-6 hover:bg-blue-600"
             >
-              {isPreview ? "Exit Preview Mode" : "Enter Preview Mode"}
+              {isPreview ? "Deaktiver Preview Mode" : "Aktiver Preview Mode"}
             </button>
 
             {isPreview && (
@@ -643,7 +643,7 @@ export default function FlowEditor() {
             onClick={() => setIsPlayMode(false)}
             className="px-4 py-2 rounded bg-red-500 hover:bg-red-600 text-white"
           >
-            Exit Play Mode
+            Afslut Play Mode
           </button>
           <PlayMode flow={flow} onExit={() => setIsPlayMode(false)} />
         </div>

@@ -44,7 +44,7 @@ export default function CheckboxQuestion({
 
   return (
     <div className="border p-4 rounded shadow-sm bg-gray-50 space-y-4">
-      <h2 className="text-xl font-semibold">Create Checkbox Question</h2>
+      <h2 className="text-xl font-semibold">Tilføj Checkbox spørgsmål</h2>
       <input
         type="text"
         placeholder="Enter question text"
@@ -82,7 +82,7 @@ export default function CheckboxQuestion({
             onClick={handleAddOption}
             className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
           >
-            Add
+            Tilføj
           </button>
         </div>
       </div>
@@ -93,13 +93,13 @@ export default function CheckboxQuestion({
           checked={allowMultipleAnswers}
           onChange={(e) => setAllowMultipleAnswers(e.target.checked)}
         />
-        <label htmlFor="allowMultipleAnswers">Allow Multiple Answers</label>
+        <label htmlFor="allowMultipleAnswers">Tillad flere svar</label>
       </div>
       <button
         onClick={handleAddQuestion}
         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
       >
-        Add Question
+        Tilføj spørgsmål
       </button>
     </div>
   );

@@ -117,8 +117,8 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-          <h2 className="text-2xl font-bold mb-4">Flow Completed</h2>
-          <h3 className="text-lg font-semibold mb-2">Your Answers:</h3>
+          <h2 className="text-2xl font-bold mb-4">Flow er afsluttet</h2>
+          <h3 className="text-lg font-semibold mb-2">Du har svaret:</h3>
           <ul className="list-disc ml-6">
             {flow.pages.map((page, pageIndex) => (
               <li key={pageIndex} className="mb-4">
@@ -137,7 +137,7 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
             onClick={onExit}
             className="bg-blue-500 text-white px-4 py-2 rounded mt-4 hover:bg-blue-600"
           >
-            Exit Play Mode
+            Afslut Play Mode
           </button>
         </div>
       </div>
@@ -262,7 +262,7 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
               history.length === 0 ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
-            Back
+            Tilbage
           </button>
           <button
             onClick={handleNextPage}

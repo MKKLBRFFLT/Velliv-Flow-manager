@@ -104,7 +104,7 @@ export default function ConditionsEditor({
   return (
     <div className="border p-4 rounded">
       <h2 className="font-semibold text-lg mb-4">
-        Conditions for Page: {page.name}
+        Conditions for: {page.name}
       </h2>
 
       {/* Post-Conditions Section */}
@@ -117,19 +117,19 @@ export default function ConditionsEditor({
               className="border p-2 rounded mb-2 flex justify-between items-center"
             >
               <span>
-                If Question {cond.condition.questionIndex + 1}{" "}
+                Hvis spørgsmål {cond.condition.questionIndex + 1}{" "}
                 <strong>{cond.condition.operator}</strong>{" "}
-                <strong>{cond.condition.value}</strong>, go to page{" "}
+                <strong>{cond.condition.value}</strong>, gå til {" "}
                 <strong>{cond.nextPageId}</strong>
               </span>
               <button
                 onClick={() => onDeletePostCondition(index)}
                 className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
               >
-                Delete
+                Slet
               </button>
             </li>
-          )) || <p>No post-conditions defined.</p>}
+          )) || <p>Ingen post-conditions tilføjet.</p>}
         </ul>
 
         <div className="flex flex-col space-y-2">
@@ -140,7 +140,7 @@ export default function ConditionsEditor({
             }
             className="border p-2 rounded"
           >
-            <option value="-1">Select a question</option>
+            <option value="-1">Vælg et spørgsmål</option>
             {page.questions.map((q, index) => (
               <option key={index} value={index}>
                 {index + 1}. {q.text}
@@ -176,7 +176,7 @@ export default function ConditionsEditor({
             onChange={(e) => setPostConditionNextPageId(e.target.value)}
             className="border p-2 rounded"
           >
-            <option value="">Select next page</option>
+            <option value="">Vælg næste side</option>
             {allPages.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.name}
@@ -188,7 +188,7 @@ export default function ConditionsEditor({
             onClick={handleAddPostCondition}
             className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
           >
-            Add Post-Condition
+            Tilføj Post-Condition
           </button>
         </div>
       </div>
