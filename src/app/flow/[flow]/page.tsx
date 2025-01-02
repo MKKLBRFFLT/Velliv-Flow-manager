@@ -18,9 +18,14 @@ import { Flow, Page, Question } from "@/utils/types";
 
 const evaluateCondition = (
   operator: string,
-  userAnswer: number,
-  conditionValue: number
+  userAnswer: number | string | string[],
+  conditionValue: number | string
 ): boolean => {
+  if (Array.isArray(userAnswer)) {
+    // For checkbox questions, check if conditionValue is included in userAnswer
+    return userAnswer.includes(conditionValue as string);
+  }
+
   switch (operator) {
     case "=":
       return userAnswer === conditionValue;
@@ -36,6 +41,7 @@ const evaluateCondition = (
       return false;
   }
 };
+
 
 
 export default function FlowEditor() {
@@ -187,12 +193,7 @@ export default function FlowEditor() {
         const conditionValue = condition.condition.value;
         const operator = condition.condition.operator || "=";
   
-        if (typeof userAnswer === "number" && typeof conditionValue === "number") {
-          return evaluateCondition(operator, userAnswer, conditionValue);
-        }
-  
-        // Fallback for non-numeric conditions (exact match)
-        return userAnswer === conditionValue;
+        return evaluateCondition(operator, userAnswer, conditionValue);
       });
   
       if (matchedPostCondition) {
@@ -212,6 +213,7 @@ export default function FlowEditor() {
       setCurrentPageIndex(nextPageIndex);
     }
   };
+  
   
 
   const handlePreviousPage = () => {
@@ -541,31 +543,36 @@ export default function FlowEditor() {
                         // handling for checkbox input
                         <div className="mt-2">
                           {q.options?.map((option, optionIndex) => (
-                            <label key={optionIndex} className="flex items-center">
+                            <label key={optionIndex} className="flex items-center space-x-2">
                               <input
-                                type="checkbox"
-                                value={option}
+                                  type="checkbox"
+                                  value={option}
+                                  checked={
+                                    Array.isArray(previewAnswers[index])
+                                      ? (previewAnswers[index] as string[]).includes(option)
+                                      : false
+                                  }
                                 onChange={(e) => {
-                                  const selectedOptions = Array.isArray(
-                                    previewAnswers[index]
-                                  )
+                                  const selectedOptions = Array.isArray(previewAnswers[index])
                                     ? (previewAnswers[index] as string[])
                                     : [];
-                                  if (e.target.checked) {
-                                    handleAnswerChange(index, [
-                                      ...selectedOptions,
-                                      option,
-                                    ]);
+                                  if (q.allowMultipleAnswers) {
+                                    if (e.target.checked) {
+                                      handleAnswerChange(index, [...selectedOptions, option]);
+                                    } else {
+                                      handleAnswerChange(
+                                        index,
+                                        selectedOptions.filter((opt) => opt !== option)
+                                      );
+                                    }
                                   } else {
-                                    handleAnswerChange(
-                                      index,
-                                      selectedOptions.filter(
-                                        (opt) => opt !== option
-                                      )
-                                    );
+                                    // Single answer mode: Only allow one selected option
+                                    handleAnswerChange(index, e.target.checked ? [option] : []);
                                   }
-                                } } />
-                              <span className="ml-2">{option}</span>
+                                }}
+                                className="border-gray-300 focus:ring-blue-500 h-4 w-4"
+                              />
+                              <span>{option}</span>
                             </label>
                           ))}
                         </div>

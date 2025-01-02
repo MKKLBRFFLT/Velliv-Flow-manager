@@ -4,24 +4,39 @@ import React, { useState } from "react";
 
 const evaluateCondition = (
   operator: string,
-  userAnswer: number,
-  conditionValue: number
+  userAnswer: string | number | string[],
+  conditionValue: string | number | string[]
 ): boolean => {
-  switch (operator) {
-    case "=":
-      return userAnswer === conditionValue;
-    case ">":
-      return userAnswer > conditionValue;
-    case "<":
-      return userAnswer < conditionValue;
-    case ">=":
-      return userAnswer >= conditionValue;
-    case "<=":
-      return userAnswer <= conditionValue;
-    default:
-      return false; // Fallback for unsupported operators
+  if (Array.isArray(userAnswer)) {
+    if (Array.isArray(conditionValue)) {
+      // Check if all condition values are in the user's answers
+      return conditionValue.every((val) => userAnswer.includes(val));
+    }
+    // Check if the single condition value is in the user's answers
+    return userAnswer.includes(conditionValue as string);
   }
+
+  if (typeof userAnswer === "number" && typeof conditionValue === "number") {
+    switch (operator) {
+      case "=":
+        return userAnswer === conditionValue;
+      case ">":
+        return userAnswer > conditionValue;
+      case "<":
+        return userAnswer < conditionValue;
+      case ">=":
+        return userAnswer >= conditionValue;
+      case "<=":
+        return userAnswer <= conditionValue;
+      default:
+        return false;
+    }
+  }
+
+  // For other types, check equality
+  return userAnswer === conditionValue;
 };
+
 
 type Question = {
   text: string;
@@ -72,20 +87,15 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
 
   const handleNextPage = () => {
     const currentAnswers = answers;
-
+  
     const matchedPostCondition = currentPage.postConditions?.find((condition) => {
       const answer = currentAnswers[currentPageIndex * 100 + condition.condition.questionIndex];
       const conditionValue = condition.condition.value;
       const operator = condition.condition.operator || "=";
-
-      if (typeof answer === "number" && typeof conditionValue === "number") {
-        return evaluateCondition(operator, answer, conditionValue);
-      }
-
-      // Fallback for non-numeric conditions (exact match)
-      return answer === conditionValue;
+  
+      return evaluateCondition(operator, answer, conditionValue);
     });
-
+  
     if (matchedPostCondition) {
       const nextPageIndex = flow.pages.findIndex((page) => page.id === matchedPostCondition.nextPageId);
       if (nextPageIndex !== -1) {
@@ -93,9 +103,10 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
         return;
       }
     }
-
+  
     setIsEnd(true); // If no conditions are matched, end the flow
   };
+  
 
   const handlePreviousPage = () => {
     if (currentPageIndex > 0) {
@@ -202,23 +213,31 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
               ) : q.inputType === "checkbox" && q.options ? (
                 <div className="mt-2">
                   {q.options.map((option, optionIndex) => (
-                    <label key={optionIndex} className="flex items-center">
+                    <label key={optionIndex} className="flex items-center space-x-2">
                       <input
                         type="checkbox"
                         value={option}
-                        checked={Array.isArray(answers[currentPageIndex * 100 + index]) &&
-                          (answers[currentPageIndex * 100 + index] as string[]).includes(option)}
+                        checked={
+                          Array.isArray(answers[currentPageIndex * 100 + index]) &&
+                          (answers[currentPageIndex * 100 + index] as string[]).includes(option)
+                        }
                         onChange={(e) => {
                           const currentAnswers = Array.isArray(answers[currentPageIndex * 100 + index])
                             ? (answers[currentPageIndex * 100 + index] as string[])
                             : [];
-                          if (e.target.checked) {
-                            handleAnswerChange(index, [...currentAnswers, option]);
+                          if (q.allowMultipleAnswers) {
+                            // Multiple answers allowed: Add or remove the selected option
+                            if (e.target.checked) {
+                              handleAnswerChange(index, [...currentAnswers, option]);
+                            } else {
+                              handleAnswerChange(
+                                index,
+                                currentAnswers.filter((opt) => opt !== option)
+                              );
+                            }
                           } else {
-                            handleAnswerChange(
-                              index,
-                              currentAnswers.filter((opt) => opt !== option)
-                            );
+                            // Single answer mode: Only allow one option
+                            handleAnswerChange(index, e.target.checked ? [option] : []);
                           }
                         }}
                         className="mr-2"

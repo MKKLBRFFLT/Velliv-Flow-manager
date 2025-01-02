@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 
@@ -6,10 +6,15 @@ type CheckboxQuestionProps = {
   onAddQuestion: (question: any) => void;
 };
 
-export default function CheckboxQuestion({ onAddQuestion }: CheckboxQuestionProps) {
+export default function CheckboxQuestion({
+  onAddQuestion,
+}: CheckboxQuestionProps) {
   const [questionText, setQuestionText] = useState<string>("");
   const [options, setOptions] = useState<string[]>([]);
   const [newOption, setNewOption] = useState<string>("");
+  const [allowMultipleAnswers, setAllowMultipleAnswers] = useState<boolean>(
+    false
+  );
 
   const handleAddOption = () => {
     if (!newOption.trim()) return;
@@ -28,11 +33,13 @@ export default function CheckboxQuestion({ onAddQuestion }: CheckboxQuestionProp
       text: questionText.trim(),
       inputType: "checkbox",
       options,
+      allowMultipleAnswers,
     };
 
     onAddQuestion(newQuestion);
     setQuestionText("");
     setOptions([]);
+    setAllowMultipleAnswers(false);
   };
 
   return (
@@ -79,6 +86,15 @@ export default function CheckboxQuestion({ onAddQuestion }: CheckboxQuestionProp
           </button>
         </div>
       </div>
+      <div className="flex items-center space-x-2">
+        <input
+          type="checkbox"
+          id="allowMultipleAnswers"
+          checked={allowMultipleAnswers}
+          onChange={(e) => setAllowMultipleAnswers(e.target.checked)}
+        />
+        <label htmlFor="allowMultipleAnswers">Allow Multiple Answers</label>
+      </div>
       <button
         onClick={handleAddQuestion}
         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
@@ -88,3 +104,4 @@ export default function CheckboxQuestion({ onAddQuestion }: CheckboxQuestionProp
     </div>
   );
 }
+
