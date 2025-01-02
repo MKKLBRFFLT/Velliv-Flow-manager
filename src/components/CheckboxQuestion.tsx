@@ -1,63 +1,107 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
 type CheckboxQuestionProps = {
   onAddQuestion: (question: any) => void;
 };
 
-export default function CheckboxQuestion({ onAddQuestion }: CheckboxQuestionProps) {
-  const [text, setText] = useState('');
-  const [options, setOptions] = useState<string[]>(['']);
+export default function CheckboxQuestion({
+  onAddQuestion,
+}: CheckboxQuestionProps) {
+  const [questionText, setQuestionText] = useState<string>("");
+  const [options, setOptions] = useState<string[]>([]);
+  const [newOption, setNewOption] = useState<string>("");
+  const [allowMultipleAnswers, setAllowMultipleAnswers] = useState<boolean>(
+    false
+  );
+
+  const handleAddOption = () => {
+    if (!newOption.trim()) return;
+    setOptions([...options, newOption.trim()]);
+    setNewOption("");
+  };
+
+  const handleRemoveOption = (index: number) => {
+    setOptions(options.filter((_, i) => i !== index));
+  };
 
   const handleAddQuestion = () => {
-    if (!text) return;
+    if (!questionText.trim() || options.length < 2) return;
 
     const newQuestion = {
-      text,
-      inputType: 'checkbox',
+      text: questionText.trim(),
+      inputType: "checkbox",
       options,
+      allowMultipleAnswers,
     };
 
     onAddQuestion(newQuestion);
-    setText('');
-    setOptions(['']);
+    setQuestionText("");
+    setOptions([]);
+    setAllowMultipleAnswers(false);
   };
-
-  const handleOptionChange = (index: number, value: string) => {
-    const newOptions = [...options];
-    newOptions[index] = value;
-    setOptions(newOptions);
-  };
-
-  const addOption = () => setOptions([...options, '']);
 
   return (
-    <div>
-      <h2>Add Checkbox Question</h2>
+    <div className="border p-4 rounded shadow-sm bg-gray-50 space-y-4">
+      <h2 className="text-xl font-semibold">Create Checkbox Question</h2>
       <input
         type="text"
-        placeholder="Question text"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
+        placeholder="Enter question text"
+        value={questionText}
+        onChange={(e) => setQuestionText(e.target.value)}
         className="border p-2 rounded w-full"
       />
-      {options.map((option, index) => (
+      <div className="space-y-2">
+        <h3 className="font-medium">Options:</h3>
+        <ul className="space-y-2">
+          {options.map((option, index) => (
+            <li
+              key={index}
+              className="flex justify-between items-center border p-2 rounded bg-white shadow-sm"
+            >
+              {option}
+              <button
+                onClick={() => handleRemoveOption(index)}
+                className="text-red-500 hover:text-red-700"
+              >
+                Remove
+              </button>
+            </li>
+          ))}
+        </ul>
+        <div className="flex space-x-2">
+          <input
+            type="text"
+            placeholder="Enter new option"
+            value={newOption}
+            onChange={(e) => setNewOption(e.target.value)}
+            className="border p-2 rounded w-full"
+          />
+          <button
+            onClick={handleAddOption}
+            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          >
+            Add
+          </button>
+        </div>
+      </div>
+      <div className="flex items-center space-x-2">
         <input
-          key={index}
-          type="text"
-          placeholder={`Option ${index + 1}`}
-          value={option}
-          onChange={(e) => handleOptionChange(index, e.target.value)}
-          className="border p-2 rounded w-full mt-2"
+          type="checkbox"
+          id="allowMultipleAnswers"
+          checked={allowMultipleAnswers}
+          onChange={(e) => setAllowMultipleAnswers(e.target.checked)}
         />
-      ))}
-      <button onClick={addOption} className="bg-blue-500 text-white px-4 py-2 rounded mt-2 hover:bg-blue-600">
-        Add Option
-      </button>
-      <button onClick={handleAddQuestion} className="bg-green-500 text-white px-4 py-2 rounded mt-2 hover:bg-green-600">
+        <label htmlFor="allowMultipleAnswers">Allow Multiple Answers</label>
+      </div>
+      <button
+        onClick={handleAddQuestion}
+        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+      >
         Add Question
       </button>
     </div>
   );
 }
+

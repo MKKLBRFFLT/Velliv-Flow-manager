@@ -2,20 +2,52 @@
 
 import React, { useState } from "react";
 
+const evaluateCondition = (
+  operator: string,
+  userAnswer: string | number | string[],
+  conditionValue: string | number | string[]
+): boolean => {
+  if (Array.isArray(userAnswer)) {
+    if (Array.isArray(conditionValue)) {
+      return conditionValue.every((val) => userAnswer.includes(val));
+    }
+    return userAnswer.includes(conditionValue as string);
+  }
+
+  if (typeof userAnswer === "number" && typeof conditionValue === "number") {
+    switch (operator) {
+      case "=":
+        return userAnswer === conditionValue;
+      case ">":
+        return userAnswer > conditionValue;
+      case "<":
+        return userAnswer < conditionValue;
+      case ">=":
+        return userAnswer >= conditionValue;
+      case "<=":
+        return userAnswer <= conditionValue;
+      default:
+        return false;
+    }
+  }
+
+  return userAnswer === conditionValue;
+};
+
 type Question = {
   text: string;
   inputType: string;
-  answers?: string[]; // For dropdown or multiple-choice questions
-  allowMultipleAnswers?: boolean; // For allowing multiple selections
-};
-
-type PreCondition = {
-  questionIndex: number;
-  expectedValue: string | number | string[];
+  answers?: string[];
+  options?: string[];
+  allowMultipleAnswers?: boolean;
 };
 
 type PostCondition = {
-  condition: { questionIndex: number; value: string | number | string[] };
+  condition: {
+    questionIndex: number;
+    value: string | number | string[];
+    operator?: string;
+  };
   nextPageId: string;
 };
 
@@ -23,7 +55,6 @@ type Page = {
   id: string;
   name: string;
   questions: Question[];
-  preConditions?: PreCondition[];
   postConditions?: PostCondition[];
 };
 
@@ -33,18 +64,22 @@ type Flow = {
 
 type PlayModeProps = {
   flow: Flow;
-  onExit: () => void; // Callback to exit play mode
+  onExit: () => void;
 };
 
 export default function PlayMode({ flow, onExit }: PlayModeProps) {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string | number | string[]>>({});
+  const [history, setHistory] = useState<number[]>([]);
   const [isEnd, setIsEnd] = useState(false);
 
   const currentPage = flow.pages[currentPageIndex];
 
   const handleAnswerChange = (index: number, value: string | number | string[]) => {
-    setAnswers((prev) => ({ ...prev, [currentPageIndex * 100 + index]: value }));
+    setAnswers((prev) => ({
+      ...prev,
+      [currentPageIndex * 100 + index]: typeof value === "string" && !isNaN(Number(value)) ? Number(value) : value,
+    }));
   };
 
   const handleNextPage = () => {
@@ -52,33 +87,30 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
 
     const matchedPostCondition = currentPage.postConditions?.find((condition) => {
       const answer = currentAnswers[currentPageIndex * 100 + condition.condition.questionIndex];
-      return answer === condition.condition.value;
+      const conditionValue = condition.condition.value;
+      const operator = condition.condition.operator || "=";
+
+      return evaluateCondition(operator, answer, conditionValue);
     });
 
     if (matchedPostCondition) {
       const nextPageIndex = flow.pages.findIndex((page) => page.id === matchedPostCondition.nextPageId);
       if (nextPageIndex !== -1) {
+        setHistory((prevHistory) => [...prevHistory, currentPageIndex]); // Add current page to history
         setCurrentPageIndex(nextPageIndex);
         return;
       }
     }
 
-    setIsEnd(true);
+    setIsEnd(true); // If no conditions are matched, end the flow
   };
 
   const handlePreviousPage = () => {
-    if (currentPageIndex > 0) {
-      setCurrentPageIndex((prevIndex) => prevIndex - 1);
+    if (history.length > 0) {
+      const previousPageIndex = history[history.length - 1]; // Get the last visited page
+      setHistory((prevHistory) => prevHistory.slice(0, -1)); // Remove the last entry from history
+      setCurrentPageIndex(previousPageIndex);
     }
-  };
-
-  const canEnterPage = (page: Page): boolean => {
-    return (
-      page.preConditions?.every((condition) => {
-        const answer = answers[currentPageIndex * 100 + condition.questionIndex];
-        return answer === condition.expectedValue;
-      }) ?? true
-    );
   };
 
   if (isEnd) {
@@ -112,11 +144,6 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
     );
   }
 
-  if (!canEnterPage(currentPage)) {
-    setIsEnd(true);
-    return null;
-  }
-
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
@@ -132,19 +159,13 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
                   onChange={(e) => handleAnswerChange(index, Number(e.target.value))}
                   className="border p-2 rounded w-full"
                 />
-              ) : q.inputType === "dropdown" && q.answers ? (
-                <select
+              ) : q.inputType === "text" ? (
+                <input
+                  type="text"
                   value={answers[currentPageIndex * 100 + index] || ""}
                   onChange={(e) => handleAnswerChange(index, e.target.value)}
                   className="border p-2 rounded w-full"
-                >
-                  <option value="">Select an answer</option>
-                  {q.answers.map((option, idx) => (
-                    <option key={idx} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
+                />
               ) : q.inputType === "multiple-choice" && q.answers ? (
                 <div className="flex flex-col space-y-2">
                   {q.answers.map((option, optionIndex) => (
@@ -175,6 +196,53 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
                     </button>
                   ))}
                 </div>
+              ) : q.inputType === "dropdown" && q.options ? (
+                <select
+                  value={answers[currentPageIndex * 100 + index] || ""}
+                  onChange={(e) => handleAnswerChange(index, e.target.value)}
+                  className="border p-2 rounded w-full"
+                >
+                  <option value="">Select an option</option>
+                  {q.options.map((option, optionIndex) => (
+                    <option key={optionIndex} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              ) : q.inputType === "checkbox" && q.options ? (
+                <div className="mt-2">
+                  {q.options.map((option, optionIndex) => (
+                    <label key={optionIndex} className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        value={option}
+                        checked={
+                          Array.isArray(answers[currentPageIndex * 100 + index]) &&
+                          (answers[currentPageIndex * 100 + index] as string[]).includes(option)
+                        }
+                        onChange={(e) => {
+                          const currentAnswers = Array.isArray(answers[currentPageIndex * 100 + index])
+                            ? (answers[currentPageIndex * 100 + index] as string[])
+                            : [];
+                          if (q.allowMultipleAnswers) {
+                            if (e.target.checked) {
+                              handleAnswerChange(index, [...currentAnswers, option]);
+                            } else {
+                              handleAnswerChange(
+                                index,
+                                currentAnswers.filter((opt) => opt !== option)
+                              );
+                            }
+                          } else {
+                            handleAnswerChange(index, e.target.checked ? [option] : []);
+                          }
+                        }}
+                        className="mr-2"
+                      />
+                      {option}
+                    </label>
+                  ))}
+                </div>
               ) : q.inputType === "calendar" ? (
                 <input
                   type="date"
@@ -182,23 +250,16 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
                   onChange={(e) => handleAnswerChange(index, e.target.value)}
                   className="border p-2 rounded w-full"
                 />
-              ) : (
-                <input
-                  type="text"
-                  value={answers[currentPageIndex * 100 + index] || ""}
-                  onChange={(e) => handleAnswerChange(index, e.target.value)}
-                  className="border p-2 rounded w-full"
-                />
-              )}
+              ) : null}
             </li>
           ))}
         </ul>
         <div className="flex justify-between mt-4">
           <button
             onClick={handlePreviousPage}
-            disabled={currentPageIndex === 0}
+            disabled={history.length === 0}
             className={`bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400 ${
-              currentPageIndex === 0 ? "opacity-50 cursor-not-allowed" : ""
+              history.length === 0 ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
             Back
@@ -214,3 +275,5 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
     </div>
   );
 }
+
+
