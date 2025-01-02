@@ -9,10 +9,8 @@ const evaluateCondition = (
 ): boolean => {
   if (Array.isArray(userAnswer)) {
     if (Array.isArray(conditionValue)) {
-      // Check if all condition values are in the user's answers
       return conditionValue.every((val) => userAnswer.includes(val));
     }
-    // Check if the single condition value is in the user's answers
     return userAnswer.includes(conditionValue as string);
   }
 
@@ -33,26 +31,24 @@ const evaluateCondition = (
     }
   }
 
-  // For other types, check equality
   return userAnswer === conditionValue;
 };
-
 
 type Question = {
   text: string;
   inputType: string;
-  answers?: string[]; // For multiple-choice questions
-  options?: string[]; // For dropdown questions
-  allowMultipleAnswers?: boolean; // For allowing multiple selections
+  answers?: string[];
+  options?: string[];
+  allowMultipleAnswers?: boolean;
 };
 
 type PostCondition = {
   condition: {
-    questionIndex: number; // Index of the question to evaluate
-    value: string | number | string[]; // Value to match
-    operator?: string; // Optional operator ('=', '>', '<', '>=', '<=')
+    questionIndex: number;
+    value: string | number | string[];
+    operator?: string;
   };
-  nextPageId: string; // ID of the next page if condition is met
+  nextPageId: string;
 };
 
 type Page = {
@@ -68,12 +64,13 @@ type Flow = {
 
 type PlayModeProps = {
   flow: Flow;
-  onExit: () => void; // Callback to exit play mode
+  onExit: () => void;
 };
 
 export default function PlayMode({ flow, onExit }: PlayModeProps) {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string | number | string[]>>({});
+  const [history, setHistory] = useState<number[]>([]);
   const [isEnd, setIsEnd] = useState(false);
 
   const currentPage = flow.pages[currentPageIndex];
@@ -87,30 +84,32 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
 
   const handleNextPage = () => {
     const currentAnswers = answers;
-  
+
     const matchedPostCondition = currentPage.postConditions?.find((condition) => {
       const answer = currentAnswers[currentPageIndex * 100 + condition.condition.questionIndex];
       const conditionValue = condition.condition.value;
       const operator = condition.condition.operator || "=";
-  
+
       return evaluateCondition(operator, answer, conditionValue);
     });
-  
+
     if (matchedPostCondition) {
       const nextPageIndex = flow.pages.findIndex((page) => page.id === matchedPostCondition.nextPageId);
       if (nextPageIndex !== -1) {
+        setHistory((prevHistory) => [...prevHistory, currentPageIndex]); // Add current page to history
         setCurrentPageIndex(nextPageIndex);
         return;
       }
     }
-  
+
     setIsEnd(true); // If no conditions are matched, end the flow
   };
-  
 
   const handlePreviousPage = () => {
-    if (currentPageIndex > 0) {
-      setCurrentPageIndex((prevIndex) => prevIndex - 1);
+    if (history.length > 0) {
+      const previousPageIndex = history[history.length - 1]; // Get the last visited page
+      setHistory((prevHistory) => prevHistory.slice(0, -1)); // Remove the last entry from history
+      setCurrentPageIndex(previousPageIndex);
     }
   };
 
@@ -226,7 +225,6 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
                             ? (answers[currentPageIndex * 100 + index] as string[])
                             : [];
                           if (q.allowMultipleAnswers) {
-                            // Multiple answers allowed: Add or remove the selected option
                             if (e.target.checked) {
                               handleAnswerChange(index, [...currentAnswers, option]);
                             } else {
@@ -236,7 +234,6 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
                               );
                             }
                           } else {
-                            // Single answer mode: Only allow one option
                             handleAnswerChange(index, e.target.checked ? [option] : []);
                           }
                         }}
@@ -260,9 +257,9 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
         <div className="flex justify-between mt-4">
           <button
             onClick={handlePreviousPage}
-            disabled={currentPageIndex === 0}
+            disabled={history.length === 0}
             className={`bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400 ${
-              currentPageIndex === 0 ? "opacity-50 cursor-not-allowed" : ""
+              history.length === 0 ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
             Back
@@ -278,4 +275,5 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
     </div>
   );
 }
+
 
