@@ -47,7 +47,7 @@ export default function MultipleChoiceQuestion({
       <h2 className="text-xl font-semibold">Tilføj Multiple Choice spørgsmål</h2>
       <input
         type="text"
-        placeholder="Enter question text"
+        placeholder="Indtast spørgsmålstekst"
         value={questionText}
         onChange={(e) => setQuestionText(e.target.value)}
         className="border p-2 rounded w-full"
@@ -65,7 +65,7 @@ export default function MultipleChoiceQuestion({
                 onClick={() => handleRemoveAnswer(index)}
                 className="text-red-500 hover:text-red-700"
               >
-                Remove
+                Slet
               </button>
             </li>
           ))}
@@ -73,7 +73,7 @@ export default function MultipleChoiceQuestion({
         <div className="flex space-x-2">
           <input
             type="text"
-            placeholder="Enter new answer"
+            placeholder="Indtast nyt svar"
             value={newAnswer}
             onChange={(e) => setNewAnswer(e.target.value)}
             className="border p-2 rounded w-full"

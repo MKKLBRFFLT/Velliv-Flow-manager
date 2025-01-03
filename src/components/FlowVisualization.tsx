@@ -117,7 +117,7 @@ export default function FlowVisualization({ flow, onSwitchPage, onDeletePage }: 
             id: `post-edge-${page.id}-${index}`,
             source: `page-${page.id}`,
             target: `page-${targetPage.id}`,
-            label: `If Question ${condition.condition.questionIndex + 1} ${operator} "${condition.condition.value}"`,
+            label: `Hvis spørgsmål ${condition.condition.questionIndex + 1} ${operator} "${condition.condition.value}"`,
             labelStyle: { fill: "#FFA032", fontWeight: "bold" },
             animated: true,
             markerEnd: {

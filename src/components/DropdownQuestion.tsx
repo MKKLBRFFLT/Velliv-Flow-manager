@@ -40,7 +40,7 @@ export default function DropdownQuestion({ onAddQuestion }: DropdownQuestionProp
       <h2 className="text-xl font-semibold">Tilføj Dropdown spørgsmål</h2>
       <input
         type="text"
-        placeholder="Enter question text"
+        placeholder="Indtast spørgsmålstekst"
         value={questionText}
         onChange={(e) => setQuestionText(e.target.value)}
         className="border p-2 rounded w-full"
@@ -66,7 +66,7 @@ export default function DropdownQuestion({ onAddQuestion }: DropdownQuestionProp
         <div className="flex space-x-2">
           <input
             type="text"
-            placeholder="Enter new option"
+            placeholder="Indtast nyt svar"
             value={newOption}
             onChange={(e) => setNewOption(e.target.value)}
             className="border p-2 rounded w-full"

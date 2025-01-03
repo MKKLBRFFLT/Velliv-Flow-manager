@@ -26,7 +26,7 @@ export default function NumericQuestion({ onAddQuestion }: NumericQuestionProps)
       <h2 className="text-xl font-semibold mb-4">Add Numeric Question</h2>
       <input
         type="text"
-        placeholder="Enter question text"
+        placeholder="Indtast spørgsmålstekst"
         value={text}
         onChange={(e) => setText(e.target.value)}
         className="border p-2 rounded w-full mb-4"
