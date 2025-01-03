@@ -84,7 +84,12 @@ export default function FlowVisualization({ flow, onSwitchPage, onDeletePage }: 
                 }}
                 onClick={(e) => {
                   e.stopPropagation();
-                  onDeletePage(page.id);
+                  const confirmation = window.confirm(
+                    `Er du sikker på du vil slette: "${page.name}"?`
+                  );
+                  if (confirmation) {
+                    onDeletePage(page.id);
+                  }
                 }}
               >
                 ×

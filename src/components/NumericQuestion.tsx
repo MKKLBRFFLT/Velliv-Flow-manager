@@ -10,30 +10,30 @@ export default function NumericQuestion({ onAddQuestion }: NumericQuestionProps)
   const [text, setText] = useState('');
 
   const handleAddQuestion = () => {
-    if (!text) return;
+    if (!text.trim()) return;
 
     const newQuestion = {
-      text,
-      inputType: 'number', // The question type remains numeric
+      text: text.trim(),
+      inputType: 'number', // Numeric question type
     };
 
     onAddQuestion(newQuestion);
-    setText(''); // Reset the input field after adding the question
+    setText(''); // Reset input field
   };
 
   return (
-    <div>
-      <h2 className="text-xl font-semibold mb-4">Add Numeric Question</h2>
+    <div className="border p-4 rounded shadow-sm bg-gray-50 space-y-4">
+      <h2 className="text-xl font-semibold">Tilføj numerisk spørgsmål</h2>
       <input
         type="text"
         placeholder="Indtast spørgsmålstekst"
         value={text}
         onChange={(e) => setText(e.target.value)}
-        className="border p-2 rounded w-full mb-4"
+        className="border p-2 rounded w-full"
       />
       <button
         onClick={handleAddQuestion}
-        className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
       >
         Tilføj spørgsmål
       </button>

@@ -37,7 +37,7 @@ export default function DropdownQuestion({ onAddQuestion }: DropdownQuestionProp
 
   return (
     <div className="border p-4 rounded shadow-sm bg-gray-50 space-y-4">
-      <h2 className="text-xl font-semibold">Tilføj Dropdown spørgsmål</h2>
+      <h2 className="text-xl font-semibold">Tilføj dropdown spørgsmål</h2>
       <input
         type="text"
         placeholder="Indtast spørgsmålstekst"
@@ -46,7 +46,7 @@ export default function DropdownQuestion({ onAddQuestion }: DropdownQuestionProp
         className="border p-2 rounded w-full"
       />
       <div className="space-y-2">
-        <h3 className="font-medium">Options:</h3>
+        <h3 className="font-medium">Svar:</h3>
         <ul className="space-y-2">
           {options.map((option, index) => (
             <li

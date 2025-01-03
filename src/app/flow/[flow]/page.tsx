@@ -347,7 +347,12 @@ export default function FlowEditor() {
             <div className="flex space-x-2 mb-4">
               <button
                 type="button"
-                onClick={() => handleDeletePage()}
+                onClick={() => {
+                  const confirmation = window.confirm("Er du sikker på, at du vil slette denne side?");
+                  if (confirmation) {
+                    handleDeletePage();
+                  }
+                }}
                 className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
               >
                 Slet side
