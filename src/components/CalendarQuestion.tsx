@@ -22,7 +22,7 @@ export default function CalendarQuestion({ onAddQuestion }: CalendarQuestionProp
   };
 
   return (
-  <div className="border p-4 rounded shadow-sm bg-gray-50 space-y-4">
+  <div className="border p-4 rounded shadow-sm bg-gray-50 space-y-4 max-w-sm">
     <div className="flex items-center justify-between">
       <h2 className="text-xl font-semibold">Tilføj kalender spørgsmål</h2>
       <div className="group relative">

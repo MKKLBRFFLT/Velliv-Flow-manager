@@ -22,7 +22,7 @@ export default function NumericQuestion({ onAddQuestion }: NumericQuestionProps)
   };
 
   return (
-    <div className="border p-4 rounded shadow-sm bg-gray-50 space-y-4">
+    <div className="border p-4 rounded shadow-sm bg-gray-50 space-y-4 max-w-sm">
       <h2 className="text-xl font-semibold">Tilføj numerisk spørgsmål</h2>
       <input
         type="text"

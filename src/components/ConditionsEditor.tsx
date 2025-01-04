@@ -102,7 +102,7 @@ export default function ConditionsEditor({
   };
 
   return (
-    <div className="border p-4 rounded">
+    <div className="border p-4 rounded max-w-sm">
       <h2 className="font-semibold text-lg mb-4">
         Conditions for: {page.name}
       </h2>

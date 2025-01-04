@@ -425,7 +425,7 @@ export default function FlowEditor() {
                 <h2 className="text-xl font-semibold mt-6">
                   Spørgsmål på side {flow.pages[currentPageIndex]?.name}
                 </h2>
-                <ul className="space-y-4">
+                <ul className="space-y-4 max-w-sm">
                   {flow.pages[currentPageIndex]?.questions.map((q, index) => (
                     <li
                       key={index}
@@ -551,7 +551,7 @@ export default function FlowEditor() {
                 <h2 className="text-xl font-semibold mb-4">
                   Spørgsmål {flow.pages[currentPageIndex]?.name}
                 </h2>
-                <ul className="space-y-4">
+                <ul className="space-y-4 max-w-sm">
                   {flow.pages[currentPageIndex]?.questions.map((q, index) => (
                     <li
                       key={index}
@@ -701,18 +701,20 @@ export default function FlowEditor() {
                 </ul>
               </>
             )}
-            <button
-              type="button"
-              onClick={() => setIsPreview(!isPreview)}
-              className="bg-blue-500 text-white px-4 py-2 rounded mt-6 hover:bg-blue-600"
-            >
-              {isPreview ? "Deaktiver Preview Mode" : "Aktiver Preview Mode"}
-            </button>
+            <div className="flex space-x-2 mb-4">
+              <button
+                type="button"
+                onClick={() => setIsPreview(!isPreview)}
+                className="bg-blue-500 text-white px-4 py-2 rounded mt-6 hover:bg-blue-600"
+              >
+                {isPreview ? "Deaktiver Preview Mode" : "Aktiver Preview Mode"}
+              </button>
+            </div>
 
             {isPreview && (
               <div>
                 {/* Navigation Buttons */}
-                <div className="flex justify-between mt-6">
+                <div className="flex space-x-2 mb-4">
                   <button
                     onClick={handlePreviousPage}
                     disabled={currentPageIndex === 0}
