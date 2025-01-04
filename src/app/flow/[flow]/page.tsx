@@ -10,11 +10,10 @@ import CheckboxQuestion from "../../../components/CheckboxQuestion";
 import CalendarQuestion from "../../../components/CalendarQuestion";
 import DropdownQuestion from "../../../components/DropdownQuestion";
 import FlowVisualization from "../../../components/FlowVisualization";
-import { updateFlow } from "@/utils/flowStorage";
+import { updateFlow, getFlows } from "@/utils/flowStorage";
 import ConditionsEditor from "../../../components/ConditionsEditor";
 import PlayMode from "@/components/PlayMode";
 import { Flow, Page, Question } from "@/utils/types";
-
 
 const evaluateCondition = (
   operator: string,
@@ -41,8 +40,6 @@ const evaluateCondition = (
       return false;
   }
 };
-
-
 
 export default function FlowEditor() {
   const params = useParams();
@@ -101,7 +98,7 @@ export default function FlowEditor() {
       pages: [...flow.pages, newPage],
     };
 
-        // Update flows in local storage
+    // Update flows in local storage
     updateFlow(updatedFlow);
     setFlow(updatedFlow);
     setCurrentPageIndex(updatedFlow.pages.length - 1);
@@ -165,7 +162,9 @@ export default function FlowEditor() {
       if (pIndex === currentPageIndex) {
         return {
           ...page,
-          questions: page.questions.filter((_, qIndex) => qIndex !== questionIndex),
+          questions: page.questions.filter(
+            (_, qIndex) => qIndex !== questionIndex
+          ),
         };
       }
       return page;
@@ -182,20 +181,22 @@ export default function FlowEditor() {
 
   const handleNextPage = () => {
     if (!flow) return;
-  
+
     const currentPage = flow.pages[currentPageIndex];
     let nextPageIndex = currentPageIndex + 1; // Default to sequential navigation
-  
+
     // Evaluate post-conditions on the current page
     if (currentPage.postConditions?.length) {
-      const matchedPostCondition = currentPage.postConditions.find((condition) => {
-        const userAnswer = previewAnswers[condition.condition.questionIndex]; // User's input
-        const conditionValue = condition.condition.value;
-        const operator = condition.condition.operator || "=";
-  
-        return evaluateCondition(operator, userAnswer, conditionValue);
-      });
-  
+      const matchedPostCondition = currentPage.postConditions.find(
+        (condition) => {
+          const userAnswer = previewAnswers[condition.condition.questionIndex]; // User's input
+          const conditionValue = condition.condition.value;
+          const operator = condition.condition.operator || "=";
+
+          return evaluateCondition(operator, userAnswer, conditionValue);
+        }
+      );
+
       if (matchedPostCondition) {
         const targetPageIndex = flow.pages.findIndex(
           (page) => page.id === matchedPostCondition.nextPageId
@@ -207,14 +208,12 @@ export default function FlowEditor() {
         }
       }
     }
-  
+
     // Update to the determined next page if valid
     if (nextPageIndex < flow.pages.length) {
       setCurrentPageIndex(nextPageIndex);
     }
   };
-  
-  
 
   const handlePreviousPage = () => {
     if (currentPageIndex > 0) {
@@ -233,27 +232,57 @@ export default function FlowEditor() {
     handleAddPage();
   }
 
+  const handleDownloadFlow = (flowId: string) => {
+    const flows = getFlows();
+
+    const flowToDownload = flows.find((f) => f.id === flowId);
+    if (!flowToDownload) {
+      return;
+    }
+
+    const flowJsonString = JSON.stringify(flowToDownload, null, 2);
+    const blob = new Blob([flowJsonString], { type: "application/json" });
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${flowToDownload.name || "flow"}.json`;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  };
+
   if (!flow) return <div>Loading...</div>;
 
   return (
     <div className="flex">
       {!isPlayMode && (
-        <><LeftNavBar
-          onQuestionTypeChange={(type) => setQuestionType(type)}
-          flowName={flow.name} /><div className="ml-48 p-6 w-full">
+        <>
+          <LeftNavBar
+            onQuestionTypeChange={(type) => setQuestionType(type)}
+            flowName={flow.name}
+          />
+          <div className="ml-48 p-6 w-full">
             <h1 className="text-2xl font-bold mb-4">
               {isVisualizationMode
                 ? `Flow Visualization: ${flow.name}`
                 : isPreview
-                  ? `Preview: ${flow.name}`
-                  : `Editing Flow: ${flow.name}`}
+                ? `Preview: ${flow.name}`
+                : `Editing Flow: ${flow.name}`}
             </h1>
             <p className="text-gray-600 mb-6">{flow.description}</p>
 
             <div className="flex space-x-2 mb-4">
               <button
                 onClick={() => setIsPlayMode((prev) => !prev)}
-                className={`px-4 py-2 rounded ${isPlayMode ? 'bg-red-500 hover:bg-red-600' : 'bg-purple-500 hover:bg-purple-600'} text-white`}
+                className={`px-4 py-2 rounded ${
+                  isPlayMode
+                    ? "bg-red-500 hover:bg-red-600"
+                    : "bg-purple-500 hover:bg-purple-600"
+                } text-white`}
               >
                 {isPlayMode ? 'Afslut Play Mode' : 'Gå ind i Play Mode'}
               </button>
@@ -264,19 +293,30 @@ export default function FlowEditor() {
                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
               >
                 {isVisualizationMode
-                  ? "Deaktiver Visualisering"
-                  : "Aktiver Visualisering"}
+                  ? "Disable Visualization Mode"
+                  : "Enable Visualization Mode"}
+              </button>
+
+              <button
+                onClick={() => handleDownloadFlow(flow.id)}
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+              >
+                Download Flow
               </button>
             </div>
 
-            {isPlayMode && <PlayMode flow={flow} onExit={() => setIsPlayMode(false)} />}
+            {isPlayMode && (
+              <PlayMode flow={flow} onExit={() => setIsPlayMode(false)} />
+            )}
             {isVisualizationMode && (
               <FlowVisualization
                 flow={flow}
                 onSwitchPage={(pageIndex) => setCurrentPageIndex(pageIndex)}
                 onDeletePage={(pageId) => {
                   // Filter out the page with the matching ID
-                  const updatedPages = flow.pages.filter((page) => page.id !== pageId);
+                  const updatedPages = flow.pages.filter(
+                    (page) => page.id !== pageId
+                  );
 
                   // Update the flow with the remaining pages
                   setFlow({ ...flow, pages: updatedPages });
@@ -294,9 +334,11 @@ export default function FlowEditor() {
               <button
                 onClick={() => setCurrentPageIndex(0)}
                 disabled={currentPageIndex === 0}
-                className={`px-3 py-1 rounded ${currentPageIndex === 0
+                className={`px-3 py-1 rounded ${
+                  currentPageIndex === 0
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-gray-200 hover:bg-gray-300"}`}
+                    : "bg-gray-200 hover:bg-gray-300"
+                }`}
               >
                 Første side
               </button>
@@ -304,9 +346,11 @@ export default function FlowEditor() {
               <button
                 onClick={() => setCurrentPageIndex(currentPageIndex - 1)}
                 disabled={currentPageIndex === 0}
-                className={`px-3 py-1 rounded ${currentPageIndex === 0
+                className={`px-3 py-1 rounded ${
+                  currentPageIndex === 0
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-gray-200 hover:bg-gray-300"}`}
+                    : "bg-gray-200 hover:bg-gray-300"
+                }`}
               >
                 Forrige side
               </button>
@@ -318,9 +362,11 @@ export default function FlowEditor() {
               <button
                 onClick={() => setCurrentPageIndex(currentPageIndex + 1)}
                 disabled={currentPageIndex === flow.pages.length - 1}
-                className={`px-3 py-1 rounded ${currentPageIndex === flow.pages.length - 1
+                className={`px-3 py-1 rounded ${
+                  currentPageIndex === flow.pages.length - 1
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-gray-200 hover:bg-gray-300"}`}
+                    : "bg-gray-200 hover:bg-gray-300"
+                }`}
               >
                 Næste side
               </button>
@@ -328,9 +374,11 @@ export default function FlowEditor() {
               <button
                 onClick={() => setCurrentPageIndex(flow.pages.length - 1)}
                 disabled={currentPageIndex === flow.pages.length - 1}
-                className={`px-3 py-1 rounded ${currentPageIndex === flow.pages.length - 1
+                className={`px-3 py-1 rounded ${
+                  currentPageIndex === flow.pages.length - 1
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-gray-200 hover:bg-gray-300"}`}
+                    : "bg-gray-200 hover:bg-gray-300"
+                }`}
               >
                 Sidste side
               </button>
@@ -387,11 +435,7 @@ export default function FlowEditor() {
                       <p>Type: {q.inputType}</p>
 
                       {/* Handling for number input */}
-                      {q.inputType === "number" && (
-                        <p>
-                          Question: {q.text}
-                        </p>
-                      )}
+                      {q.inputType === "number" && <p>Question: {q.text}</p>}
 
                       {/* handling for text input */}
                       {q.inputType === "text" && (
@@ -402,7 +446,10 @@ export default function FlowEditor() {
                       {q.inputType === "multiple-choice" && (
                         <ul className="space-y-2">
                           {q.answers?.map((answer, answerIndex) => (
-                            <li key={answerIndex} className="border p-2 rounded">
+                            <li
+                              key={answerIndex}
+                              className="border p-2 rounded"
+                            >
                               {answer}
                             </li>
                           ))}
@@ -419,7 +466,10 @@ export default function FlowEditor() {
                           <p>Options:</p>
                           <ul className="space-y-2">
                             {q.options?.map((option, optionIndex) => (
-                              <li key={optionIndex} className="border p-2 rounded">
+                              <li
+                                key={optionIndex}
+                                className="border p-2 rounded"
+                              >
                                 {option}
                               </li>
                             ))}
@@ -433,7 +483,10 @@ export default function FlowEditor() {
                           <p>Options:</p>
                           <ul className="space-y-2">
                             {q.options?.map((option, optionIndex) => (
-                              <li key={optionIndex} className="border p-2 rounded">
+                              <li
+                                key={optionIndex}
+                                className="border p-2 rounded"
+                              >
                                 {option}
                               </li>
                             ))}
@@ -461,29 +514,37 @@ export default function FlowEditor() {
                   page={flow.pages[currentPageIndex]}
                   allPages={flow.pages}
                   onAddPostCondition={(postCondition) => {
-                    const updatedPages = flow.pages.map((page, index) => index === currentPageIndex
-                      ? {
-                        ...page,
-                        postConditions: [...(page.postConditions || []), postCondition],
-                      }
-                      : page
+                    const updatedPages = flow.pages.map((page, index) =>
+                      index === currentPageIndex
+                        ? {
+                            ...page,
+                            postConditions: [
+                              ...(page.postConditions || []),
+                              postCondition,
+                            ],
+                          }
+                        : page
                     );
                     const updatedFlow = { ...flow, pages: updatedPages };
                     updateFlow(updatedFlow);
                     setFlow(updatedFlow);
-                  } }
+                  }}
                   onDeletePostCondition={(index) => {
-                    const updatedPages = flow.pages.map((page, pageIndex) => pageIndex === currentPageIndex
-                      ? {
-                        ...page,
-                        postConditions: page.postConditions?.filter((_, i) => i !== index),
-                      }
-                      : page
+                    const updatedPages = flow.pages.map((page, pageIndex) =>
+                      pageIndex === currentPageIndex
+                        ? {
+                            ...page,
+                            postConditions: page.postConditions?.filter(
+                              (_, i) => i !== index
+                            ),
+                          }
+                        : page
                     );
                     const updatedFlow = { ...flow, pages: updatedPages };
                     updateFlow(updatedFlow);
                     setFlow(updatedFlow);
-                  } } />
+                  }}
+                />
               </>
             ) : (
               <>
@@ -503,16 +564,22 @@ export default function FlowEditor() {
                         <div className="mt-2">
                           <input
                             type="number"
-                            onChange={(e) => handleAnswerChange(index, Number(e.target.value))}
-                            className="border p-2 rounded w-full" />
+                            onChange={(e) =>
+                              handleAnswerChange(index, Number(e.target.value))
+                            }
+                            className="border p-2 rounded w-full"
+                          />
                         </div>
                       ) : q.inputType === "text" ? (
                         // handling for text input
                         <input
                           type="text"
                           placeholder={q.placeholder ?? ""}
-                          onChange={(e) => handleAnswerChange(index, e.target.value)}
-                          className="border p-2 rounded w-full" />
+                          onChange={(e) =>
+                            handleAnswerChange(index, e.target.value)
+                          }
+                          className="border p-2 rounded w-full"
+                        />
                       ) : q.inputType === "multiple-choice" ? (
                         // handling for multiple-choice
                         <div className="mt-2">
@@ -526,19 +593,23 @@ export default function FlowEditor() {
                                   )
                                     ? (previewAnswers[index] as string[])
                                     : [];
-                                  const newAnswers = currentAnswers.includes(answer)
+                                  const newAnswers = currentAnswers.includes(
+                                    answer
+                                  )
                                     ? currentAnswers.filter((a) => a !== answer)
                                     : [...currentAnswers, answer];
                                   handleAnswerChange(index, newAnswers);
                                 } else {
                                   handleAnswerChange(index, answer);
                                 }
-                              } }
-                              className={`border p-2 rounded w-full text-left ${(Array.isArray(previewAnswers[index]) &&
+                              }}
+                              className={`border p-2 rounded w-full text-left ${
+                                (Array.isArray(previewAnswers[index]) &&
                                   previewAnswers[index].includes(answer)) ||
-                                  previewAnswers[index] === answer
+                                previewAnswers[index] === answer
                                   ? "bg-blue-100"
-                                  : ""}`}
+                                  : ""
+                              }`}
                             >
                               {answer}
                             </button>
@@ -548,31 +619,46 @@ export default function FlowEditor() {
                         // handling for checkbox input
                         <div className="mt-2">
                           {q.options?.map((option, optionIndex) => (
-                            <label key={optionIndex} className="flex items-center space-x-2">
+                            <label
+                              key={optionIndex}
+                              className="flex items-center space-x-2"
+                            >
                               <input
-                                  type="checkbox"
-                                  value={option}
-                                  checked={
-                                    Array.isArray(previewAnswers[index])
-                                      ? (previewAnswers[index] as string[]).includes(option)
-                                      : false
-                                  }
+                                type="checkbox"
+                                value={option}
+                                checked={
+                                  Array.isArray(previewAnswers[index])
+                                    ? (
+                                        previewAnswers[index] as string[]
+                                      ).includes(option)
+                                    : false
+                                }
                                 onChange={(e) => {
-                                  const selectedOptions = Array.isArray(previewAnswers[index])
+                                  const selectedOptions = Array.isArray(
+                                    previewAnswers[index]
+                                  )
                                     ? (previewAnswers[index] as string[])
                                     : [];
                                   if (q.allowMultipleAnswers) {
                                     if (e.target.checked) {
-                                      handleAnswerChange(index, [...selectedOptions, option]);
+                                      handleAnswerChange(index, [
+                                        ...selectedOptions,
+                                        option,
+                                      ]);
                                     } else {
                                       handleAnswerChange(
                                         index,
-                                        selectedOptions.filter((opt) => opt !== option)
+                                        selectedOptions.filter(
+                                          (opt) => opt !== option
+                                        )
                                       );
                                     }
                                   } else {
                                     // Single answer mode: Only allow one selected option
-                                    handleAnswerChange(index, e.target.checked ? [option] : []);
+                                    handleAnswerChange(
+                                      index,
+                                      e.target.checked ? [option] : []
+                                    );
                                   }
                                 }}
                                 className="border-gray-300 focus:ring-blue-500 h-4 w-4"
@@ -585,7 +671,9 @@ export default function FlowEditor() {
                         // handling for dropdown input
                         <div className="mt-2">
                           <select
-                            onChange={(e) => handleAnswerChange(index, e.target.value)}
+                            onChange={(e) =>
+                              handleAnswerChange(index, e.target.value)
+                            }
                             className="border p-2 rounded w-full"
                           >
                             <option value="">Select an option</option>
@@ -601,8 +689,11 @@ export default function FlowEditor() {
                         <div className="mt-2">
                           <input
                             type="date"
-                            onChange={(e) => handleAnswerChange(index, e.target.value)}
-                            className="border p-2 rounded w-full" />
+                            onChange={(e) =>
+                              handleAnswerChange(index, e.target.value)
+                            }
+                            className="border p-2 rounded w-full"
+                          />
                         </div>
                       ) : null}
                     </li>
@@ -619,28 +710,33 @@ export default function FlowEditor() {
             </button>
 
             {isPreview && (
-            <div>
-              {/* Navigation Buttons */}
-              <div className="flex justify-between mt-6">
-                <button
-                  onClick={handlePreviousPage}
-                  disabled={currentPageIndex === 0}
-                  className={`bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 ${currentPageIndex === 0 && "cursor-not-allowed opacity-50"}`}
-                >
-                  Previous
-                </button>
-                <button
-                  onClick={handleNextPage}
-                  disabled={currentPageIndex === flow.pages.length - 1}
-                  className={`bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 ${currentPageIndex === flow.pages.length - 1 &&
-                    "cursor-not-allowed opacity-50"}`}
-                >
-                  Next
-                </button>
+              <div>
+                {/* Navigation Buttons */}
+                <div className="flex justify-between mt-6">
+                  <button
+                    onClick={handlePreviousPage}
+                    disabled={currentPageIndex === 0}
+                    className={`bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 ${
+                      currentPageIndex === 0 && "cursor-not-allowed opacity-50"
+                    }`}
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={handleNextPage}
+                    disabled={currentPageIndex === flow.pages.length - 1}
+                    className={`bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 ${
+                      currentPageIndex === flow.pages.length - 1 &&
+                      "cursor-not-allowed opacity-50"
+                    }`}
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
-          </div></>
+            )}
+          </div>
+        </>
       )}
       {isPlayMode && (
         <div className="p-6 w-full">
