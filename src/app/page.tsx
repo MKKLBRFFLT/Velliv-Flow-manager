@@ -9,8 +9,9 @@ export default function HomePage() {
   const [flowDescription, setFlowDescription] = useState<string>("");
   const router = useRouter();
 
-  const handleCreateFlow = (e: React.FormEvent) => {
+  const handleCreateFlow = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!flowName) return;
 
     const flowId = Date.now().toString();
@@ -22,16 +23,34 @@ export default function HomePage() {
       pages: [],
     };
 
-    // Save the flow in local storage
+    //Save the flow in local storage
     addFlow(newFlow);
 
-    // Log the flow details
+    // 2. Optionally log the flow details (for debugging)
     console.log(JSON.stringify(newFlow, null, 2));
 
-    // Redirect to the flow editing page
+    // 3. Save the flow to MongoDB via your API route
+    try {
+      const response = await fetch("/api/flows", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newFlow),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to save flow to MongoDB:", response.statusText);
+        // Optionally handle error (show a notification, etc.)
+      } else {
+        console.log("Flow successfully saved to MongoDB");
+      }
+    } catch (error) {
+      console.error("Error saving flow to MongoDB:", error);
+      // Handle or display the error as needed
+    }
+
+    // 4. Redirect to the flow editing page
     router.push(`/flow/${flowId}`);
   };
-
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 space-y-8">
       {/* Create Flow Card */}
