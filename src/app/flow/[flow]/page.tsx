@@ -423,7 +423,7 @@ export default function FlowEditor() {
                   <DropdownQuestion onAddQuestion={handleAddQuestion} />
                 ) : null}
                 <h2 className="text-xl font-semibold mt-6">
-                  Spørgsmål på side {flow.pages[currentPageIndex]?.name}
+                  Spørgsmål og conditions på side {flow.pages[currentPageIndex]?.name}
                 </h2>
                 <ul className="space-y-4 max-w-sm">
                   {flow.pages[currentPageIndex]?.questions.map((q, index) => (
@@ -435,11 +435,11 @@ export default function FlowEditor() {
                       <p>Type: {q.inputType}</p>
 
                       {/* Handling for number input */}
-                      {q.inputType === "number" && <p>Question: {q.text}</p>}
+                      {q.inputType === "number" && <p>Spørgsmål: {q.text}</p>}
 
                       {/* handling for text input */}
                       {q.inputType === "text" && (
-                        <p>Placeholder: {q.placeholder ?? "None"}</p>
+                        <p>Placeholdertekst: {q.placeholder ?? "None"}</p>
                       )}
 
                       {/* handling for multiple-choice */}
@@ -463,7 +463,7 @@ export default function FlowEditor() {
                       {/* handling for checkbox input */}
                       {q.inputType === "checkbox" && (
                         <>
-                          <p>Options:</p>
+                          <p>Svar:</p>
                           <ul className="space-y-2">
                             {q.options?.map((option, optionIndex) => (
                               <li
@@ -480,7 +480,7 @@ export default function FlowEditor() {
                       {/* handling for dropdown input */}
                       {q.inputType === "dropdown" && (
                         <>
-                          <p>Options:</p>
+                          <p>Svar:</p>
                           <ul className="space-y-2">
                             {q.options?.map((option, optionIndex) => (
                               <li
@@ -496,7 +496,7 @@ export default function FlowEditor() {
 
                       {/* handling for calendar input */}
                       {q.inputType === "calendar" && (
-                        <p>This is a calendar question.</p>
+                        <p>Dette er et Kalender spørgsmål.</p>
                       )}
 
                       {/* Delete Question Button */}
