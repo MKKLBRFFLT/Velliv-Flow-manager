@@ -43,17 +43,17 @@ export default function MultipleChoiceQuestion({
   };
 
   return (
-    <div className="border p-4 rounded shadow-sm bg-gray-50 space-y-4">
-      <h2 className="text-xl font-semibold">Create Multiple Choice Question</h2>
+    <div className="border p-4 rounded shadow-sm bg-gray-50 space-y-4 max-w-sm">
+      <h2 className="text-xl font-semibold">Tilføj multiple choice spørgsmål</h2>
       <input
         type="text"
-        placeholder="Enter question text"
+        placeholder="Indtast spørgsmålstekst"
         value={questionText}
         onChange={(e) => setQuestionText(e.target.value)}
         className="border p-2 rounded w-full"
       />
       <div className="space-y-2">
-        <h3 className="font-medium">Answers:</h3>
+        <h3 className="font-medium">Svar:</h3>
         <ul className="space-y-2">
           {answers.map((answer, index) => (
             <li
@@ -65,7 +65,7 @@ export default function MultipleChoiceQuestion({
                 onClick={() => handleRemoveAnswer(index)}
                 className="text-red-500 hover:text-red-700"
               >
-                Remove
+                Slet
               </button>
             </li>
           ))}
@@ -73,7 +73,7 @@ export default function MultipleChoiceQuestion({
         <div className="flex space-x-2">
           <input
             type="text"
-            placeholder="Enter new answer"
+            placeholder="Indtast nyt svar"
             value={newAnswer}
             onChange={(e) => setNewAnswer(e.target.value)}
             className="border p-2 rounded w-full"
@@ -82,7 +82,7 @@ export default function MultipleChoiceQuestion({
             onClick={handleAddAnswer}
             className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
           >
-            Add
+            Tilføj
           </button>
         </div>
       </div>
@@ -93,13 +93,13 @@ export default function MultipleChoiceQuestion({
           checked={allowMultipleAnswers}
           onChange={(e) => setAllowMultipleAnswers(e.target.checked)}
         />
-        <label htmlFor="allowMultipleAnswers">Allow Multiple Answers</label>
+        <label htmlFor="allowMultipleAnswers">Tillad flere svar</label>
       </div>
       <button
         onClick={handleAddQuestion}
         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
       >
-        Add Question
+        Tilføj spørgsmål
       </button>
     </div>
   );

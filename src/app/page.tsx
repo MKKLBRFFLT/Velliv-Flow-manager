@@ -37,16 +37,16 @@ export default function HomePage() {
       {/* Create Flow Card */}
       <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-md">
         <h1 className="text-2xl font-bold mb-6 text-center">
-          Create a New Flow
+          Opret et nyt flow
         </h1>
         <form onSubmit={handleCreateFlow}>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
-              Flow Name
+              Flow navn
             </label>
             <input
               type="text"
-              placeholder="Enter flow name"
+              placeholder="Indtast flow navn"
               value={flowName}
               onChange={(e) => setFlowName(e.target.value)}
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -54,10 +54,10 @@ export default function HomePage() {
           </div>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
-              Flow Description
+              Flow beskrivelse
             </label>
             <textarea
-              placeholder="Enter a short description"
+              placeholder="Indtast en kort beskrivelse"
               value={flowDescription}
               onChange={(e) => setFlowDescription(e.target.value)}
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -67,7 +67,7 @@ export default function HomePage() {
             type="submit"
             className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition duration-200"
           >
-            Create Flow
+            Opret Flow
           </button>
         </form>
       </div>

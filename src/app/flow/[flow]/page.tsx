@@ -284,7 +284,7 @@ export default function FlowEditor() {
                     : "bg-purple-500 hover:bg-purple-600"
                 } text-white`}
               >
-                {isPlayMode ? "Exit Play Mode" : "Enter Play Mode"}
+                {isPlayMode ? 'Afslut Play Mode' : 'Gå ind i Play Mode'}
               </button>
 
               <button
@@ -395,7 +395,12 @@ export default function FlowEditor() {
             <div className="flex space-x-2 mb-4">
               <button
                 type="button"
-                onClick={() => handleDeletePage()}
+                onClick={() => {
+                  const confirmation = window.confirm("Er du sikker på, at du vil slette denne side?");
+                  if (confirmation) {
+                    handleDeletePage();
+                  }
+                }}
                 className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
               >
                 Slet side
@@ -418,9 +423,9 @@ export default function FlowEditor() {
                   <DropdownQuestion onAddQuestion={handleAddQuestion} />
                 ) : null}
                 <h2 className="text-xl font-semibold mt-6">
-                  Spørgsmål på side {flow.pages[currentPageIndex]?.name}
+                  Spørgsmål og conditions på side {flow.pages[currentPageIndex]?.name}
                 </h2>
-                <ul className="space-y-4">
+                <ul className="space-y-4 max-w-sm">
                   {flow.pages[currentPageIndex]?.questions.map((q, index) => (
                     <li
                       key={index}
@@ -430,11 +435,11 @@ export default function FlowEditor() {
                       <p>Type: {q.inputType}</p>
 
                       {/* Handling for number input */}
-                      {q.inputType === "number" && <p>Question: {q.text}</p>}
+                      {q.inputType === "number" && <p>Spørgsmål: {q.text}</p>}
 
                       {/* handling for text input */}
                       {q.inputType === "text" && (
-                        <p>Placeholder: {q.placeholder ?? "None"}</p>
+                        <p>Placeholdertekst: {q.placeholder ?? "None"}</p>
                       )}
 
                       {/* handling for multiple-choice */}
@@ -449,8 +454,8 @@ export default function FlowEditor() {
                             </li>
                           ))}
                           <p>
-                            Allow Multiple Answers:{" "}
-                            {q.allowMultipleAnswers ? "Yes" : "No"}
+                            Tillad flere svar:{" "}
+                            {q.allowMultipleAnswers ? "Ja" : "Nej"}
                           </p>
                         </ul>
                       )}
@@ -458,7 +463,7 @@ export default function FlowEditor() {
                       {/* handling for checkbox input */}
                       {q.inputType === "checkbox" && (
                         <>
-                          <p>Options:</p>
+                          <p>Svar:</p>
                           <ul className="space-y-2">
                             {q.options?.map((option, optionIndex) => (
                               <li
@@ -475,7 +480,7 @@ export default function FlowEditor() {
                       {/* handling for dropdown input */}
                       {q.inputType === "dropdown" && (
                         <>
-                          <p>Options:</p>
+                          <p>Svar:</p>
                           <ul className="space-y-2">
                             {q.options?.map((option, optionIndex) => (
                               <li
@@ -491,7 +496,7 @@ export default function FlowEditor() {
 
                       {/* handling for calendar input */}
                       {q.inputType === "calendar" && (
-                        <p>This is a calendar question.</p>
+                        <p>Dette er et Kalender spørgsmål.</p>
                       )}
 
                       {/* Delete Question Button */}
@@ -499,7 +504,7 @@ export default function FlowEditor() {
                         onClick={() => handleDeleteQuestion(index)}
                         className="bg-red-500 text-white px-2 py-1 rounded mt-2 hover:bg-red-600"
                       >
-                        Delete
+                        Slet
                       </button>
                     </li>
                   ))}
@@ -546,7 +551,7 @@ export default function FlowEditor() {
                 <h2 className="text-xl font-semibold mb-4">
                   Spørgsmål {flow.pages[currentPageIndex]?.name}
                 </h2>
-                <ul className="space-y-4">
+                <ul className="space-y-4 max-w-sm">
                   {flow.pages[currentPageIndex]?.questions.map((q, index) => (
                     <li
                       key={index}
@@ -696,18 +701,20 @@ export default function FlowEditor() {
                 </ul>
               </>
             )}
-            <button
-              type="button"
-              onClick={() => setIsPreview(!isPreview)}
-              className="bg-blue-500 text-white px-4 py-2 rounded mt-6 hover:bg-blue-600"
-            >
-              {isPreview ? "Exit Preview Mode" : "Enter Preview Mode"}
-            </button>
+            <div className="flex space-x-2 mb-4">
+              <button
+                type="button"
+                onClick={() => setIsPreview(!isPreview)}
+                className="bg-blue-500 text-white px-4 py-2 rounded mt-6 hover:bg-blue-600"
+              >
+                {isPreview ? "Deaktiver Preview Mode" : "Aktiver Preview Mode"}
+              </button>
+            </div>
 
             {isPreview && (
               <div>
                 {/* Navigation Buttons */}
-                <div className="flex justify-between mt-6">
+                <div className="flex space-x-2 mb-4">
                   <button
                     onClick={handlePreviousPage}
                     disabled={currentPageIndex === 0}
@@ -739,7 +746,7 @@ export default function FlowEditor() {
             onClick={() => setIsPlayMode(false)}
             className="px-4 py-2 rounded bg-red-500 hover:bg-red-600 text-white"
           >
-            Exit Play Mode
+            Afslut Play Mode
           </button>
           <PlayMode flow={flow} onExit={() => setIsPlayMode(false)} />
         </div>

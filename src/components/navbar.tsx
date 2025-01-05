@@ -39,22 +39,22 @@ export default function LeftNavBar({
       {isEditingFlow && (
         <div className="flex flex-col text-xl space-y-4 text-white">
           <button onClick={() => onQuestionTypeChange?.("number")}>
-            Numeric Question
+            Numerisk spørgsmål
           </button>
           <button onClick={() => onQuestionTypeChange?.("text")}>
-            Text Question
+            Tekst spørgsmål
           </button>
           <button onClick={() => onQuestionTypeChange?.('multiple-choice')}>
-            Multiple Choice Question
+            Multiple Choice spørgsmål
           </button>
           <button onClick={() => onQuestionTypeChange?.('checkbox')}>
-            Checkbox Question
+            Checkbox spørgsmål
           </button>
           <button onClick={() => onQuestionTypeChange?.('calendar')}>
-            Calendar Question
+           Kalender spørgsmål
           </button>
           <button onClick={() => onQuestionTypeChange?.('dropdown')}>
-            Dropdown Question
+            Dropdown spørgsmål
           </button>
         </div>
       )}

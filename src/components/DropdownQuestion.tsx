@@ -36,17 +36,17 @@ export default function DropdownQuestion({ onAddQuestion }: DropdownQuestionProp
   };
 
   return (
-    <div className="border p-4 rounded shadow-sm bg-gray-50 space-y-4">
-      <h2 className="text-xl font-semibold">Create Dropdown Question</h2>
+    <div className="border p-4 rounded shadow-sm bg-gray-50 space-y-4 max-w-sm">
+      <h2 className="text-xl font-semibold">Tilføj dropdown spørgsmål</h2>
       <input
         type="text"
-        placeholder="Enter question text"
+        placeholder="Indtast spørgsmålstekst"
         value={questionText}
         onChange={(e) => setQuestionText(e.target.value)}
         className="border p-2 rounded w-full"
       />
       <div className="space-y-2">
-        <h3 className="font-medium">Options:</h3>
+        <h3 className="font-medium">Svar:</h3>
         <ul className="space-y-2">
           {options.map((option, index) => (
             <li
@@ -58,7 +58,7 @@ export default function DropdownQuestion({ onAddQuestion }: DropdownQuestionProp
                 onClick={() => handleRemoveOption(index)}
                 className="text-red-500 hover:text-red-700"
               >
-                Remove
+                Fjern
               </button>
             </li>
           ))}
@@ -66,7 +66,7 @@ export default function DropdownQuestion({ onAddQuestion }: DropdownQuestionProp
         <div className="flex space-x-2">
           <input
             type="text"
-            placeholder="Enter new option"
+            placeholder="Indtast nyt svar"
             value={newOption}
             onChange={(e) => setNewOption(e.target.value)}
             className="border p-2 rounded w-full"
@@ -75,7 +75,7 @@ export default function DropdownQuestion({ onAddQuestion }: DropdownQuestionProp
             onClick={handleAddOption}
             className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
           >
-            Add
+            Tilføj
           </button>
         </div>
       </div>
@@ -83,7 +83,7 @@ export default function DropdownQuestion({ onAddQuestion }: DropdownQuestionProp
         onClick={handleAddQuestion}
         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
       >
-        Add Question
+        Tilføj spørgsmål
       </button>
     </div>
   );

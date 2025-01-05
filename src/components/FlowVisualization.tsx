@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import ReactFlow, {
   Controls,
   Background,
@@ -84,7 +84,12 @@ export default function FlowVisualization({ flow, onSwitchPage, onDeletePage }: 
                 }}
                 onClick={(e) => {
                   e.stopPropagation();
-                  onDeletePage(page.id);
+                  const confirmation = window.confirm(
+                    `Er du sikker på du vil slette: "${page.name}"?`
+                  );
+                  if (confirmation) {
+                    onDeletePage(page.id);
+                  }
                 }}
               >
                 ×
@@ -117,7 +122,7 @@ export default function FlowVisualization({ flow, onSwitchPage, onDeletePage }: 
             id: `post-edge-${page.id}-${index}`,
             source: `page-${page.id}`,
             target: `page-${targetPage.id}`,
-            label: `If Question ${condition.condition.questionIndex + 1} ${operator} "${condition.condition.value}"`,
+            label: `Hvis spørgsmål ${condition.condition.questionIndex + 1} ${operator} "${condition.condition.value}"`,
             labelStyle: { fill: "#FFA032", fontWeight: "bold" },
             animated: true,
             markerEnd: {
