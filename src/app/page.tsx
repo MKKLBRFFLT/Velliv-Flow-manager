@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { addFlow } from "@/utils/flowStorage";
-import { saveFlows } from "@/utils/flowStorage";
+import { getFlows } from "@/utils/flowStorage";
 
 export default function HomePage() {
   const [flowName, setFlowName] = useState<string>("");
@@ -31,99 +31,60 @@ export default function HomePage() {
     // Log the flow details
     console.log(JSON.stringify(newFlow, null, 2));
 
-    // Save to mongo
-    try {
-      const response = await fetch("/api/flows", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newFlow),
-      });
-
-      if (!response.ok) {
-        console.error("Failed to save flow to MongoDB:", response.statusText);
-      } else {
-        console.log("Flow successfully saved to MongoDB");
-      }
-    } catch (error) {
-      console.error("Error saving flow to MongoDB:", error);
-    }
-
     // Redirect to the flow editing page
     router.push(`/flow/${flowId}`);
   };
 
-  const handleLoadFlows = async () => {
+  const handleLoadFlows = () => {
     try {
-      const response = await fetch("/api/flows");
-      if (!response.ok) {
-        throw new Error(`Failed to load flows from DB: ${response.statusText}`);
-      }
-      const data = await response.json();
-      const flowsFromDB = data.flows;
+      const flowsFromLocalStorage = getFlows();
 
-      saveFlows(flowsFromDB);
-
-      console.log("Flows loaded from DB and saved to local storage.");
-
-      setLoadedFlows(flowsFromDB);
-    } catch (err) {
-      console.error("Error loading flows:", err);
+      setLoadedFlows(flowsFromLocalStorage);
+    } catch {
+      console.error("Error loading flows from local storage");
     }
   };
 
-  const handleUploadFlow = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUploadFlow = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
-  
+
     try {
       const text = await file.text();
       const parsedFlow = JSON.parse(text);
 
       // In case the id already exists in the database
       parsedFlow.id = Date.now().toString();
-  
+
       const isValidFlow =
         parsedFlow &&
         typeof parsedFlow.id === "string" &&
         typeof parsedFlow.name === "string" &&
         typeof parsedFlow.description === "string" &&
         Array.isArray(parsedFlow.pages);
-  
+
       if (!isValidFlow) {
         alert("Ugyldigt flow format.");
         return;
       }
-  
+
       if (parsedFlow._id) {
         delete parsedFlow._id;
       }
-  
+
       addFlow(parsedFlow);
-  
-      try {
-        const response = await fetch("/api/flows", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(parsedFlow),
-        });
-  
-        if (!response.ok) {
-          alert("Kunne ikke gemme flow i databasen.");
-        } else {
-          alert("Dit Flow er nu uploadet!");
-          router.push(`/flow/${parsedFlow.id}`);
-        }
-      } catch {
-        alert("Kunne ikke gemme flow i databasen.");
-      }
+
+      alert("Dit flow er uploadet!");
+      router.push(`/flow/${parsedFlow.id}`);
     } catch {
       alert("Kunne ikke læse filen.");
     } finally {
       event.target.value = "";
     }
   };
-  
-  
+
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 space-y-8">
       {/* Create Flow Card */}
@@ -164,7 +125,6 @@ export default function HomePage() {
         </form>
       </div>
 
-      
       {/* Upload Flow Card */}
       <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-md">
         <h1 className="text-2xl font-bold mb-6 text-center">
@@ -175,9 +135,8 @@ export default function HomePage() {
           accept="application/json"
           onChange={handleUploadFlow}
           className="block w-full text-sm text-gray-600 file:py-2 file:px-4 file:rounded file:border-0 file:bg-blue-500 file:text-white hover:file:bg-blue-600"
-  />
+        />
       </div>
-
 
       {/* Manage (Load) Flows Card */}
       <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-md">
@@ -185,7 +144,7 @@ export default function HomePage() {
           Rediger eksisterende flows
         </h1>
         <p className="text-gray-600 text-center mb-4">
-          Se og arbejd videre på flows i databasen.
+          Se og arbejd videre på gemte flows.
         </p>
         <button
           type="button"
@@ -197,7 +156,9 @@ export default function HomePage() {
 
         {/* Display loaded flows */}
         {loadedFlows.length === 0 ? (
-          <p className="text-center text-gray-500">Ingen hentede flows endnu.</p>
+          <p className="text-center text-gray-500">
+            Ingen hentede flows endnu.
+          </p>
         ) : (
           <ul className="space-y-2">
             {loadedFlows.map((flow) => (
