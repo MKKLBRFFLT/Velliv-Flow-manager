@@ -18,6 +18,7 @@
       | "dropdown"
       | "tekst-block";
     placeholder?: string;
+    body?: string;
     answers?: string[];
     allowMultipleAnswers?: boolean;
     options?: string[];

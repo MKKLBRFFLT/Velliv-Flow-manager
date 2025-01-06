@@ -424,8 +424,8 @@ export default function FlowEditor() {
                   <CalendarQuestion onAddQuestion={handleAddQuestion} />
                 ) : questionType === "dropdown" ? (
                   <DropdownQuestion onAddQuestion={handleAddQuestion} />
-                ) : questionType === "tekst-block" ? ( // Rettet navn
-                  <TekstBlock onAddTekstBlock={handleAddQuestion} /> // Korrekt komponent og props
+                ) : questionType === "tekst-block" ? ( 
+                  <TekstBlock onAddTekstBlock={handleAddQuestion} /> 
                 ) : null}
                 
 
@@ -508,9 +508,17 @@ export default function FlowEditor() {
                         <p>Dette er et Kalender spørgsmål.</p>
                       )}
 
-                      {/* Handling for tekst-block */}
-                      {q.inputType === "tekst-block" && (
-                        <p className="italic">{q.text}</p>
+                      
+                      {q.inputType === "tekst-block" ? (
+                      <>
+                      <p className="font-bold">{q.text}</p> {/* Titel */}
+                      <p className="italic">{q.body || q.placeholder}</p> {/* Brødtekst */}
+                      </>
+                      ) : (
+                      <>
+                      {/* rendering for andre typer */}
+                      <p className="font-medium">{q.text}</p>
+                      </>
                       )}
 
 
