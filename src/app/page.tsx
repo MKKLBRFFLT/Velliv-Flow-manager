@@ -70,6 +70,58 @@ export default function HomePage() {
       console.error("Error loading flows:", err);
     }
   };
+
+  const handleUploadFlow = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+  
+    try {
+      const text = await file.text();
+      const parsedFlow = JSON.parse(text);
+  
+      const isValidFlow =
+        parsedFlow &&
+        typeof parsedFlow.id === "string" &&
+        typeof parsedFlow.name === "string" &&
+        typeof parsedFlow.description === "string" &&
+        Array.isArray(parsedFlow.pages);
+  
+      if (!isValidFlow) {
+        alert("Ugyldigt flow format.");
+        return;
+      }
+  
+      if (parsedFlow._id) {
+        delete parsedFlow._id;
+      }
+  
+      addFlow(parsedFlow);
+  
+      try {
+        const response = await fetch("/api/flows", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(parsedFlow),
+        });
+  
+        if (!response.ok) {
+          alert("Kunne ikke gemme flow i databasen.");
+        } else {
+          alert("Dit Flow er nu uploadet!");
+
+          router.push(`/flow/${parsedFlow.id}`);
+        }
+      } catch {
+        alert("Kunne ikke gemme flow i databasen.");
+      }
+    } catch {
+      alert("Kunne ikke læse filen.");
+    } finally {
+      event.target.value = "";
+    }
+  };
+  
+  
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 space-y-8">
       {/* Create Flow Card */}
@@ -109,6 +161,21 @@ export default function HomePage() {
           </button>
         </form>
       </div>
+
+      
+      {/* Upload Flow Card */}
+      <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-md">
+        <h1 className="text-2xl font-bold mb-6 text-center">
+          Upload et eksisterende flow
+        </h1>
+        <input
+          type="file"
+          accept="application/json"
+          onChange={handleUploadFlow}
+          className="block w-full text-sm text-gray-600 file:py-2 file:px-4 file:rounded file:border-0 file:bg-blue-500 file:text-white hover:file:bg-blue-600"
+  />
+      </div>
+
 
       {/* Manage (Load) Flows Card */}
       <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-md">
