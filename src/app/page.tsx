@@ -197,7 +197,7 @@ export default function HomePage() {
 
         {/* Display loaded flows */}
         {loadedFlows.length === 0 ? (
-          <p className="text-center text-gray-500">Ingen flows loadede endnu.</p>
+          <p className="text-center text-gray-500">Ingen hentede flows endnu.</p>
         ) : (
           <ul className="space-y-2">
             {loadedFlows.map((flow) => (
