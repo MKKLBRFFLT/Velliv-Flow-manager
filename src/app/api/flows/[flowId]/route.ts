@@ -1,15 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/lib/db";
 
-interface RouteContext {
-  params: {
-    flowId: string;
-  };
-}
-
-export async function PUT(request: Request, { params }: RouteContext) {
+export async function PUT(request: NextRequest, { params }: { params: { flowId: string } }) {
   try {
-    const flowId =  await params.flowId;
+    const { flowId } = params;
     const updatedFlow = await request.json();
 
     if (updatedFlow._id) {
@@ -19,7 +13,6 @@ export async function PUT(request: Request, { params }: RouteContext) {
     const client = await clientPromise;
     const db = client.db("flowmaster");
 
-    // e.g. If your doc has { "id": "1736112661794" } 
     const result = await db
       .collection("flows")
       .updateOne({ id: flowId }, { $set: updatedFlow });
@@ -32,7 +25,7 @@ export async function PUT(request: Request, { params }: RouteContext) {
     }
 
     return NextResponse.json({
-      message: `Flow ${flowId} updated.`,
+      message: `Flow ${flowId} updated successfully.`,
       matchedCount: result.matchedCount,
       modifiedCount: result.modifiedCount,
     });
@@ -41,3 +34,4 @@ export async function PUT(request: Request, { params }: RouteContext) {
     return NextResponse.json({ error: String(error) }, { status: 500 });
   }
 }
+
