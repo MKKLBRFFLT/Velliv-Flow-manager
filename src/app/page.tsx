@@ -78,6 +78,9 @@ export default function HomePage() {
     try {
       const text = await file.text();
       const parsedFlow = JSON.parse(text);
+
+      // In case the id already exists in the database
+      parsedFlow.id = Date.now().toString();
   
       const isValidFlow =
         parsedFlow &&
@@ -108,7 +111,6 @@ export default function HomePage() {
           alert("Kunne ikke gemme flow i databasen.");
         } else {
           alert("Dit Flow er nu uploadet!");
-
           router.push(`/flow/${parsedFlow.id}`);
         }
       } catch {
