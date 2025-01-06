@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/lib/db";
 
-export async function PUT(request: NextRequest, context: { params: { flowId: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Record<string, string> }) {
   try {
-    const { flowId } = context.params;
+    const flowId = params.flowId;
     const updatedFlow = await request.json();
 
     if (updatedFlow._id) {
