@@ -578,8 +578,7 @@ export default function FlowEditor() {
                   {flow.pages[currentPageIndex]?.questions.map((q, index) => (
                     <li
                       key={index}
-                      className="border p-4 rounded shadow-sm bg-gray-50"
-                    >
+                      className="border p-4 rounded shadow-sm bg-gray-50">
                       <p className="font-medium">{q.text}</p>
 
                       {q.inputType === "number" ? (
@@ -707,6 +706,7 @@ export default function FlowEditor() {
                             ))}
                           </select>
                         </div>
+                        
                       ) : q.inputType === "calendar" ? (
                         // handling for calendar input
                         <div className="mt-2">
@@ -718,6 +718,14 @@ export default function FlowEditor() {
                             className="border p-2 rounded w-full"
                           />
                         </div>
+                              ) : q.inputType === "tekst-block" ? (
+                                // Handling for tekst-block
+                                <>
+                                  <p className="font-bold">{q.text}</p> {/* Titel */}
+                                  <p className="italic">
+                                    {q.body || "Ingen brødtekst tilgængelig"}
+                                  </p> {/* Brødtekst */}
+                                </>
                       ) : null}
                     </li>
                   ))}
