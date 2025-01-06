@@ -182,22 +182,22 @@ export default function HomePage() {
       {/* Manage (Load) Flows Card */}
       <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-md">
         <h1 className="text-2xl font-bold mb-6 text-center">
-          Manage Existing Flows
+          Rediger eksisterende flows
         </h1>
         <p className="text-gray-600 text-center mb-4">
-          View and manage existing flows from the database.
+          Se og arbejd videre på flows i databasen.
         </p>
         <button
           type="button"
           onClick={handleLoadFlows}
           className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 mb-4"
         >
-          Load Flows from DB
+          Load Flows
         </button>
 
         {/* Display loaded flows */}
         {loadedFlows.length === 0 ? (
-          <p className="text-center text-gray-500">No flows loaded yet.</p>
+          <p className="text-center text-gray-500">Ingen flows loadede endnu.</p>
         ) : (
           <ul className="space-y-2">
             {loadedFlows.map((flow) => (
