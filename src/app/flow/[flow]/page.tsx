@@ -9,6 +9,7 @@ import MultipleChoiceQuestion from "../../../components/MultipleChoiceQuestion";
 import CheckboxQuestion from "../../../components/CheckboxQuestion";
 import CalendarQuestion from "../../../components/CalendarQuestion";
 import DropdownQuestion from "../../../components/DropdownQuestion";
+import TekstBlock from "@/components/TekstBlock";
 import FlowVisualization from "../../../components/FlowVisualization";
 import { updateFlow, getFlows } from "@/utils/flowStorage";
 import ConditionsEditor from "../../../components/ConditionsEditor";
@@ -47,8 +48,8 @@ export default function FlowEditor() {
   const [isVisualizationMode, setIsVisualizationMode] = useState(false);
   const [isPlayMode, setIsPlayMode] = useState(false);
   const [questionType, setQuestionType] = useState<
-    "number" | "text" | "multiple-choice" | "checkbox" | "calendar" | "dropdown"
-  >("number");
+  "number" | "text" | "multiple-choice" | "checkbox" | "calendar" | "dropdown" | "tekst-block"
+>("number");
   const [isPreview, setIsPreview] = useState<boolean>(false);
   const [previewAnswers, setPreviewAnswers] = useState<
     Record<number, string | number | string[]>
@@ -421,7 +422,12 @@ export default function FlowEditor() {
                   <CalendarQuestion onAddQuestion={handleAddQuestion} />
                 ) : questionType === "dropdown" ? (
                   <DropdownQuestion onAddQuestion={handleAddQuestion} />
+                ) : questionType === "tekst-block" ? ( // Rettet navn
+                  <TekstBlock onAddTekstBlock={handleAddQuestion} /> // Korrekt komponent og props
                 ) : null}
+                
+
+                
                 <h2 className="text-xl font-semibold mt-6">
                   Spørgsmål og conditions på side {flow.pages[currentPageIndex]?.name}
                 </h2>
@@ -498,6 +504,12 @@ export default function FlowEditor() {
                       {q.inputType === "calendar" && (
                         <p>Dette er et Kalender spørgsmål.</p>
                       )}
+
+                      {/* Handling for tekst-block */}
+                      {q.inputType === "tekst-block" && (
+                        <p className="italic">{q.text}</p>
+                      )}
+
 
                       {/* Delete Question Button */}
                       <button

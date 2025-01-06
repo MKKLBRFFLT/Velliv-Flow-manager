@@ -15,7 +15,8 @@
       | "multiple-choice"
       | "checkbox"
       | "calendar"
-      | "dropdown";
+      | "dropdown"
+      | "tekst-block";
     placeholder?: string;
     answers?: string[];
     allowMultipleAnswers?: boolean;
