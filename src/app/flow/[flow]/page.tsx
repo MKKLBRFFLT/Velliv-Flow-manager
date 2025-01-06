@@ -9,6 +9,7 @@ import MultipleChoiceQuestion from "../../../components/MultipleChoiceQuestion";
 import CheckboxQuestion from "../../../components/CheckboxQuestion";
 import CalendarQuestion from "../../../components/CalendarQuestion";
 import DropdownQuestion from "../../../components/DropdownQuestion";
+import TekstBlock from "@/components/TekstBlock";
 import FlowVisualization from "../../../components/FlowVisualization";
 import { updateFlow, getFlows } from "@/utils/flowStorage";
 import ConditionsEditor from "../../../components/ConditionsEditor";
@@ -47,8 +48,8 @@ export default function FlowEditor() {
   const [isVisualizationMode, setIsVisualizationMode] = useState(false);
   const [isPlayMode, setIsPlayMode] = useState(false);
   const [questionType, setQuestionType] = useState<
-    "number" | "text" | "multiple-choice" | "checkbox" | "calendar" | "dropdown"
-  >("number");
+  "number" | "text" | "multiple-choice" | "checkbox" | "calendar" | "dropdown" | "tekst-block"
+>("number");
   const [isPreview, setIsPreview] = useState<boolean>(false);
   const [previewAnswers, setPreviewAnswers] = useState<
     Record<number, string | number | string[]>
@@ -423,7 +424,12 @@ export default function FlowEditor() {
                   <CalendarQuestion onAddQuestion={handleAddQuestion} />
                 ) : questionType === "dropdown" ? (
                   <DropdownQuestion onAddQuestion={handleAddQuestion} />
+                ) : questionType === "tekst-block" ? ( 
+                  <TekstBlock onAddTekstBlock={handleAddQuestion} /> 
                 ) : null}
+                
+
+                
                 <h2 className="text-xl font-semibold mt-6">
                   Spørgsmål og conditions på side{" "}
                   {flow.pages[currentPageIndex]?.name}
@@ -502,6 +508,20 @@ export default function FlowEditor() {
                         <p>Dette er et Kalender spørgsmål.</p>
                       )}
 
+                      
+                      {q.inputType === "tekst-block" ? (
+                      <>
+                      <p className="font-bold">{q.text}</p> {/* Titel */}
+                      <p className="italic">{q.body || q.placeholder}</p> {/* Brødtekst */}
+                      </>
+                      ) : (
+                      <>
+                      {/* rendering for andre typer */}
+                      <p className="font-medium">{q.text}</p>
+                      </>
+                      )}
+
+
                       {/* Delete Question Button */}
                       <button
                         onClick={() => handleDeleteQuestion(index)}
@@ -558,8 +578,7 @@ export default function FlowEditor() {
                   {flow.pages[currentPageIndex]?.questions.map((q, index) => (
                     <li
                       key={index}
-                      className="border p-4 rounded shadow-sm bg-gray-50"
-                    >
+                      className="border p-4 rounded shadow-sm bg-gray-50">
                       <p className="font-medium">{q.text}</p>
 
                       {q.inputType === "number" ? (
@@ -687,6 +706,7 @@ export default function FlowEditor() {
                             ))}
                           </select>
                         </div>
+                        
                       ) : q.inputType === "calendar" ? (
                         // handling for calendar input
                         <div className="mt-2">
@@ -698,6 +718,14 @@ export default function FlowEditor() {
                             className="border p-2 rounded w-full"
                           />
                         </div>
+                              ) : q.inputType === "tekst-block" ? (
+                                // Handling for tekst-block
+                                <>
+                                  <p className="font-bold">{q.text}</p> {/* Titel */}
+                                  <p className="italic">
+                                    {q.body || "Ingen brødtekst tilgængelig"}
+                                  </p> {/* Brødtekst */}
+                                </>
                       ) : null}
                     </li>
                   ))}

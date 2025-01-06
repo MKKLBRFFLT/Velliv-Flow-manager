@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 type LeftNavBarProps = {
-  onQuestionTypeChange?: (type: 'number' | 'text' | 'checkbox' | 'calendar' | 'multiple-choice' | 'dropdown') => void;
+  onQuestionTypeChange?: (type: 'number' | 'text' | 'checkbox' | 'calendar' | 'multiple-choice' | 'tekst-block' | 'dropdown') => void;
   flowName?: string; 
 };
 
@@ -55,6 +55,9 @@ export default function LeftNavBar({
           </button>
           <button onClick={() => onQuestionTypeChange?.('dropdown')}>
             Dropdown spørgsmål
+          </button>
+          <button onClick={() => onQuestionTypeChange?.('tekst-block')}>
+            Tekstblok
           </button>
         </div>
       )}

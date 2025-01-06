@@ -37,6 +37,8 @@ const evaluateCondition = (
 type Question = {
   text: string;
   inputType: string;
+  placeholder?: string;
+  body?: string;
   answers?: string[];
   options?: string[];
   allowMultipleAnswers?: boolean;
@@ -250,6 +252,12 @@ export default function PlayMode({ flow, onExit }: PlayModeProps) {
                   onChange={(e) => handleAnswerChange(index, e.target.value)}
                   className="border p-2 rounded w-full"
                 />
+              )
+              : q.inputType === "tekst-block" ? (
+                <>
+                  <p className="font-bold">{q.text}</p> {/* Titel */}
+                  <p className="italic">{q.body || q.placeholder}</p> {/* Brødtekst */}
+                </>
               ) : null}
             </li>
           ))}
