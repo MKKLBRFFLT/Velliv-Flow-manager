@@ -285,7 +285,7 @@ export default function FlowEditor() {
                     : "bg-purple-500 hover:bg-purple-600"
                 } text-white`}
               >
-                {isPlayMode ? 'Afslut Play Mode' : 'Gå ind i Play Mode'}
+                {isPlayMode ? "Afslut Play Mode" : "Gå ind i Play Mode"}
               </button>
 
               <button
@@ -294,8 +294,8 @@ export default function FlowEditor() {
                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
               >
                 {isVisualizationMode
-                  ? "Disable Visualization Mode"
-                  : "Enable Visualization Mode"}
+                  ? "Deaktiver visualisering"
+                  : "Aktiver visualisering"}
               </button>
 
               <button
@@ -397,7 +397,9 @@ export default function FlowEditor() {
               <button
                 type="button"
                 onClick={() => {
-                  const confirmation = window.confirm("Er du sikker på, at du vil slette denne side?");
+                  const confirmation = window.confirm(
+                    "Er du sikker på, at du vil slette denne side?"
+                  );
                   if (confirmation) {
                     handleDeletePage();
                   }
@@ -429,7 +431,8 @@ export default function FlowEditor() {
 
                 
                 <h2 className="text-xl font-semibold mt-6">
-                  Spørgsmål og conditions på side {flow.pages[currentPageIndex]?.name}
+                  Spørgsmål og conditions på side{" "}
+                  {flow.pages[currentPageIndex]?.name}
                 </h2>
                 <ul className="space-y-4 max-w-sm">
                   {flow.pages[currentPageIndex]?.questions.map((q, index) => (
@@ -688,7 +691,7 @@ export default function FlowEditor() {
                             }
                             className="border p-2 rounded w-full"
                           >
-                            <option value="">Select an option</option>
+                            <option value="">Vælg et svar</option>
                             {q.options?.map((option, optionIndex) => (
                               <option key={optionIndex} value={option}>
                                 {option}
@@ -734,7 +737,7 @@ export default function FlowEditor() {
                       currentPageIndex === 0 && "cursor-not-allowed opacity-50"
                     }`}
                   >
-                    Previous
+                    Tilbage
                   </button>
                   <button
                     onClick={handleNextPage}
@@ -744,7 +747,7 @@ export default function FlowEditor() {
                       "cursor-not-allowed opacity-50"
                     }`}
                   >
-                    Next
+                    Næste
                   </button>
                 </div>
               </div>
