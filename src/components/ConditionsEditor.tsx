@@ -40,7 +40,7 @@ export default function ConditionsEditor({
       postConditionNextPageId === ""
     ) {
       alert(
-        "Please select a question, input a value, choose an operator, and select the next page."
+        "Vær sikker på at du har valgt et spørgsmål, en værdi eller en operator og den næste side som skal kunne tilgås."
       );
       return;
     }

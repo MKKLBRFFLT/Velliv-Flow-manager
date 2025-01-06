@@ -293,8 +293,8 @@ export default function FlowEditor() {
                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
               >
                 {isVisualizationMode
-                  ? "Disable Visualization Mode"
-                  : "Enable Visualization Mode"}
+                  ? "Deaktiver visualisering"
+                  : "Aktiver visualisering"}
               </button>
 
               <button
@@ -676,7 +676,7 @@ export default function FlowEditor() {
                             }
                             className="border p-2 rounded w-full"
                           >
-                            <option value="">Select an option</option>
+                            <option value="">Vælg et svar</option>
                             {q.options?.map((option, optionIndex) => (
                               <option key={optionIndex} value={option}>
                                 {option}
@@ -722,7 +722,7 @@ export default function FlowEditor() {
                       currentPageIndex === 0 && "cursor-not-allowed opacity-50"
                     }`}
                   >
-                    Previous
+                    Tilbage
                   </button>
                   <button
                     onClick={handleNextPage}
@@ -732,7 +732,7 @@ export default function FlowEditor() {
                       "cursor-not-allowed opacity-50"
                     }`}
                   >
-                    Next
+                    Næste
                   </button>
                 </div>
               </div>
