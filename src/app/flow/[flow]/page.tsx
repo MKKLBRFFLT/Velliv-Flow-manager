@@ -284,7 +284,7 @@ export default function FlowEditor() {
                     : "bg-purple-500 hover:bg-purple-600"
                 } text-white`}
               >
-                {isPlayMode ? 'Afslut Play Mode' : 'Gå ind i Play Mode'}
+                {isPlayMode ? "Afslut Play Mode" : "Gå ind i Play Mode"}
               </button>
 
               <button
@@ -396,7 +396,9 @@ export default function FlowEditor() {
               <button
                 type="button"
                 onClick={() => {
-                  const confirmation = window.confirm("Er du sikker på, at du vil slette denne side?");
+                  const confirmation = window.confirm(
+                    "Er du sikker på, at du vil slette denne side?"
+                  );
                   if (confirmation) {
                     handleDeletePage();
                   }
@@ -423,7 +425,8 @@ export default function FlowEditor() {
                   <DropdownQuestion onAddQuestion={handleAddQuestion} />
                 ) : null}
                 <h2 className="text-xl font-semibold mt-6">
-                  Spørgsmål og conditions på side {flow.pages[currentPageIndex]?.name}
+                  Spørgsmål og conditions på side{" "}
+                  {flow.pages[currentPageIndex]?.name}
                 </h2>
                 <ul className="space-y-4 max-w-sm">
                   {flow.pages[currentPageIndex]?.questions.map((q, index) => (

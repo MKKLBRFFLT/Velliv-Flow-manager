@@ -30,9 +30,27 @@ type Question = {
     saveFlows(flows);
   }
   
-  export function updateFlow(updatedFlow: Flow): void {
+  export async function updateFlow(updatedFlow: Flow): Promise<void> {
     const flows = getFlows();
     const updatedFlows = flows.map((f) => (f.id === updatedFlow.id ? updatedFlow : f));
+    console.log(`the id is: ${updatedFlow.id}`);
     saveFlows(updatedFlows);
+  
+    try {
+      const response = await fetch(`/api/flows/${updatedFlow.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedFlow),
+      });
+  
+      if (!response.ok) {
+        console.error("Failed to update flow in MongoDB:", response.statusText);
+      } else {
+        console.log("Flow successfully updated in MongoDB");
+      }
+    } catch (error) {
+      console.error("Error updating flow in MongoDB:", error);
+
+    }
   }
   
