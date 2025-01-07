@@ -453,20 +453,23 @@ export default function FlowEditor() {
 
                       {/* handling for multiple-choice */}
                       {q.inputType === "multiple-choice" && (
-                        <ul className="space-y-2">
-                          {q.answers?.map((answer, answerIndex) => (
-                            <li
-                              key={answerIndex}
-                              className="border p-2 rounded"
-                            >
-                              {answer}
-                            </li>
-                          ))}
-                          <p>
-                            Tillad flere svar:{" "}
-                            {q.allowMultipleAnswers ? "Ja" : "Nej"}
-                          </p>
-                        </ul>
+                        <>
+                          <p>Svar:</p>
+                          <ul className="space-y-2">
+                            {q.answers?.map((answer, answerIndex) => (
+                              <li
+                                key={answerIndex}
+                                className="border p-2 rounded"
+                              >
+                                {answer}
+                              </li>
+                            ))}
+                            <p>
+                              Tillad flere svar:{" "}
+                              {q.allowMultipleAnswers ? "Ja" : "Nej"}
+                            </p>
+                          </ul>
+                        </>
                       )}
 
                       {/* handling for checkbox input */}
@@ -516,8 +519,6 @@ export default function FlowEditor() {
                       </>
                       ) : (
                       <>
-                      {/* rendering for andre typer */}
-                      <p className="font-medium">{q.text}</p>
                       </>
                       )}
 
@@ -721,7 +722,6 @@ export default function FlowEditor() {
                               ) : q.inputType === "tekst-block" ? (
                                 // Handling for tekst-block
                                 <>
-                                  <p className="font-bold">{q.text}</p> {/* Titel */}
                                   <p className="italic">
                                     {q.body || "Ingen brødtekst tilgængelig"}
                                   </p> {/* Brødtekst */}
